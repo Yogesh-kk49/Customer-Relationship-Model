@@ -5,7 +5,7 @@ from django.conf import settings
 from django.conf.urls.static import static
 
 def home(request):
-    return redirect("accounts:login")
+    return redirect("home.html")
 
 urlpatterns = [
     path("", home, name="home"),
