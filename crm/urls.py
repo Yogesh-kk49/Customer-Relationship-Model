@@ -9,8 +9,10 @@ def home(request):
 
 urlpatterns = [
     path("", home, name="home"),
+    path("admin/", admin.site.urls),
     path("accounts/", include("accounts.urls")),
     path("documents/", include("documents.urls")),
+    
 ]
 
 if settings.DEBUG:
