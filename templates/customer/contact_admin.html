@@ -1,0 +1,523 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+
+<style>
+/* ALL YOUR EXISTING CSS - UNCHANGED */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    min-height: 100vh;
+    background: #ffffff;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    position: relative;
+}
+
+body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: 
+        radial-gradient(circle at 20% 80%, rgba(37, 99, 235, 0.08) 0%, transparent 50%),
+        radial-gradient(circle at 80% 20%, rgba(16, 185, 129, 0.08) 0%, transparent 50%),
+        radial-gradient(circle at 40% 40%, rgba(59, 130, 246, 0.06) 0%, transparent 50%);
+    z-index: 0;
+}
+
+.content {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    position: relative;
+    z-index: 1;
+}
+
+.profile-container {
+    background: rgba(255, 255, 255, 0.98);
+    backdrop-filter: blur(20px);
+    padding: 60px 40px;
+    border-radius: 24px;
+    box-shadow: 0 25px 50px rgba(0,0,0,0.08);
+    text-align: center;
+    max-width: 500px;
+    width: 100%;
+    border: 1px solid rgba(0,0,0,0.05);
+    animation: slideUp 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    position: relative;
+    overflow: hidden;
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(40px) scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+.profile-container::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #2563eb, #60a5fa, #2563eb);
+    animation: shimmer 3s infinite;
+}
+
+@keyframes shimmer {
+    0% { background-position: -200px 0; }
+    100% { background-position: 200px 0; }
+    background-size: 200px 100%;
+}
+
+.avatar {
+    width: 130px;
+    height: 130px;
+    border-radius: 50%;
+    overflow: hidden;
+    margin: 0 auto 24px;
+    border: 4px solid rgba(255, 255, 255, 0.9);
+    box-shadow: 0 20px 40px rgba(37, 99, 235, 0.15);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    background: linear-gradient(135deg, rgba(37, 99, 235, 0.05), rgba(59, 130, 246, 0.1));
+}
+
+.avatar:hover {
+    transform: scale(1.08) rotate(5deg);
+    box-shadow: 0 30px 60px rgba(37, 99, 235, 0.25);
+    border-color: rgba(37, 99, 235, 0.3);
+}
+
+.avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.avatar-placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 52px;
+    font-weight: 800;
+    color: #2563eb;
+    background: rgba(37, 99, 235, 0.08);
+    text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.name {
+    font-size: 32px;
+    font-weight: 800;
+    background: linear-gradient(135deg, #1e293b, #334155);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 8px;
+    letter-spacing: -0.5px;
+}
+
+.role {
+    font-size: 16px;
+    color: #64748b;
+    font-weight: 600;
+    margin-bottom: 32px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    background: linear-gradient(135deg, rgba(37, 99, 235, 0.8), rgba(99, 102, 241, 0.8));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.email-section {
+    background: rgba(248, 250, 252, 0.9);
+    padding: 24px 28px;
+    border-radius: 20px;
+    margin-bottom: 32px;
+    border: 2px solid rgba(37, 99, 235, 0.15);
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+}
+
+.email-section:hover {
+    border-color: #2563eb;
+    transform: translateY(-4px);
+    box-shadow: 0 20px 40px rgba(37, 99, 235, 0.15);
+}
+
+.email-section strong {
+    display: block;
+    font-size: 15px;
+    color: #2563eb;
+    margin-bottom: 8px;
+    font-weight: 700;
+}
+
+.email-display {
+    font-size: 18px;
+    color: #374151;
+    font-weight: 500;
+    font-family: 'Courier New', monospace;
+    letter-spacing: 0.5px;
+}
+
+.action-btn {
+    display: block;
+    width: 100%;
+    padding: 20px 32px;
+    border-radius: 16px;
+    font-size: 17px;
+    font-weight: 700;
+    text-decoration: none;
+    color: white;
+    background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 12px 30px rgba(37, 99, 235, 0.3);
+    margin-bottom: 16px;
+}
+
+.action-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+    transition: left 0.6s;
+}
+
+.action-btn:hover::before {
+    left: 100%;
+}
+
+.action-btn:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 25px 50px rgba(37, 99, 235, 0.4);
+}
+
+.action-btn:active {
+    transform: translateY(-3px);
+}
+
+.telegram-btn {
+    background: linear-gradient(135deg, #0088cc 0%, #00aaff 100%) !important;
+    box-shadow: 0 12px 30px rgba(0, 136, 204, 0.4) !important;
+    border: 2px solid rgba(0, 136, 204, 0.3) !important;
+    margin-bottom: 16px !important;
+}
+
+.telegram-btn:hover {
+    box-shadow: 0 25px 50px rgba(0, 136, 204, 0.5) !important;
+}
+
+/* NEW: Message Form Styles - HIDDEN BY DEFAULT */
+.message-form {
+    display: none;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    margin-bottom: 16px;
+}
+
+.message-form.show {
+    display: block !important;
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.message-textarea {
+    width: 100%;
+    padding: 18px;
+    border: 2px solid rgba(0,136,204,0.3);
+    border-radius: 16px;
+    font-family: inherit;
+    font-size: 16px;
+    margin-bottom: 16px;
+    resize: vertical;
+    font-weight: 500;
+    background: rgba(255,255,255,0.9);
+    backdrop-filter: blur(10px);
+    transition: all 0.3s ease;
+    box-sizing: border-box;
+}
+
+.message-textarea:focus {
+    outline: none;
+    border-color: #0088cc;
+    box-shadow: 0 0 0 4px rgba(0,136,204,0.1);
+}
+
+.send-btn {
+    width: 100%;
+}
+
+/* ✅ NEW SUCCESS MESSAGE STYLES */
+.success-message {
+    background: linear-gradient(135deg, #10b981, #059669);
+    color: white;
+    padding: 24px 28px;
+    border-radius: 20px;
+    margin-bottom: 24px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    backdrop-filter: blur(20px);
+    animation: slideDownSuccess 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 20px 40px rgba(16, 185, 129, 0.3);
+    text-align: left;
+}
+
+@keyframes slideDownSuccess {
+    from {
+        opacity: 0;
+        transform: translateY(-30px) scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+.success-message::before {
+    content: '✅';
+    position: absolute;
+    right: 24px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 28px;
+    animation: bounce 1.5s infinite;
+}
+
+@keyframes bounce {
+    0%, 20%, 50%, 80%, 100% { transform: translateY(-50%) translateY(0); }
+    40% { transform: translateY(-50%) translateY(-10px); }
+    60% { transform: translateY(-50%) translateY(-5px); }
+}
+
+.success-icon {
+    font-size: 28px;
+    margin-right: 12px;
+    display: inline-block;
+    animation: spin 0.8s ease-out;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.success-title {
+    font-size: 22px;
+    font-weight: 800;
+    margin-bottom: 4px;
+}
+
+.success-text {
+    font-size: 16px;
+    opacity: 0.95;
+    font-weight: 500;
+}
+
+.no-admin {
+    text-align: center;
+    padding: 60px 40px;
+    color: #94a3b8;
+}
+
+.no-admin-icon {
+    font-size: 80px;
+    margin-bottom: 24px;
+    opacity: 0.7;
+}
+
+.no-admin-text {
+    font-size: 22px;
+    font-weight: 700;
+    margin-bottom: 12px;
+    color: #64748b;
+}
+
+.no-admin-subtext {
+    font-size: 16px;
+    opacity: 0.8;
+}
+
+.back-btn {
+    display: inline-flex !important;
+    align-items: center;
+    gap: 10px;
+    padding: 16px 28px !important;
+    background: #dc2626 !important;
+    color: white !important;
+    border-radius: 50px !important;
+    text-decoration: none !important;
+    font-weight: 700 !important;
+    font-size: 15px !important;
+    border: 2px solid #dc2626 !important;
+    box-shadow: 0 8px 25px rgba(220, 38, 38, 0.3) !important;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    position: relative !important;
+    z-index: 10 !important;
+    margin-top: 20px !important;
+}
+
+.back-btn:hover {
+    background: #b91c1c !important;
+    transform: translateY(-3px) !important;
+    box-shadow: 0 15px 35px rgba(220, 38, 38, 0.4) !important;
+}
+
+.back-btn:active {
+    transform: translateY(-1px) !important;
+}
+
+@media (max-width: 480px) {
+    .profile-container {
+        padding: 40px 24px;
+        margin: 10px;
+    }
+    
+    .content {
+        padding: 10px;
+    }
+    
+    .back-btn {
+        padding: 14px 24px !important;
+        font-size: 14px !important;
+    }
+}
+</style>
+
+<div class="content">
+    <div class="profile-container">
+        {% if admin_user %}
+            <!-- ✅ SUCCESS MESSAGE DISPLAY -->
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="success-message">
+                        <div style="display: flex; align-items: center;">
+                            <span class="success-icon">✨</span>
+                            <div>
+                                <div class="success-title">Message Sent Successfully!</div>
+                                <div class="success-text">{{ message }}</div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% endif %}
+
+            <!-- Profile Avatar -->
+            <div class="avatar">
+                {% if admin_user.profile_photo %}
+                    <img src="{{ admin_user.profile_photo.url }}" alt="{{ admin_user.username }}">
+                {% else %}
+                    <div class="avatar-placeholder">
+                        {{ admin_user.username|slice:":2"|upper }}
+                    </div>
+                {% endif %}
+            </div>
+
+            <!-- Admin Info -->
+            <div class="name">{{ admin_user.username }}</div>
+            <div class="role">Your Dedicated Admin</div>
+
+            <!-- Email Section -->
+            <div class="email-section">
+                <strong>📧 Contact Email</strong>
+                <div class="email-display">{{ admin_user.email }}</div>
+            </div>
+
+            <!-- ✅ OPEN KEYPAD BUTTON (Toggle) -->
+            <button type="button" id="toggleMessage" class="action-btn telegram-btn">
+                {% if messages %}✨ Send Another Message{% else %}📨 Send Secure Message to Admin{% endif %}
+            </button>
+
+            <!-- ✅ HIDDEN MESSAGE FORM - OPENS ON CLICK -->
+            <form method="POST" id="messageForm" class="message-form">
+                {% csrf_token %}
+                <textarea name="message" class="message-textarea" required 
+                          placeholder="Type your message to {{ admin_user.username }}..."
+                          rows="4"></textarea>
+                
+                <button type="submit" class="action-btn telegram-btn send-btn">
+                    📤 Send Message
+                </button>
+            </form>
+
+            <!-- Gmail Action Button (Original) -->
+            <a href="https://mail.google.com/mail/?view=cm&to={{ admin_user.email }}"
+               target="_blank" rel="noopener noreferrer"
+               class="action-btn">
+                ✉️ Message Admin on Gmail
+            </a>
+
+        {% else %}
+            <!-- No Admin State -->
+            <div class="no-admin">
+                <div class="no-admin-icon">👨‍💼</div>
+                <div class="no-admin-text">No Admin Assigned</div>
+                <div class="no-admin-subtext">
+                    Your dedicated admin will be assigned soon. 
+                    Check back later or contact support!
+                </div>
+            </div>
+        {% endif %}
+
+        <!-- FIXED Back Button - Always Visible -->
+        <div style="margin-top: 30px;">
+            <a href="{% url 'accounts:customer_dashboard' %}" class="back-btn">
+                ← Back to Dashboard
+            </a>
+        </div>
+    </div>
+</div>
+
+<script>
+// ✅ Smooth toggle functionality for message form
+document.addEventListener('DOMContentLoaded', function() {
+    const toggleBtn = document.getElementById('toggleMessage');
+    const messageForm = document.getElementById('messageForm');
+    
+    // If success message exists, update toggle button text
+    if (document.querySelector('.success-message')) {
+        toggleBtn.innerHTML = '✨ Send Another Message';
+    }
+    
+    toggleBtn.addEventListener('click', function() {
+        const isHidden = messageForm.classList.contains('show');
+        
+        if (isHidden) {
+            // Hide form
+            messageForm.classList.remove('show');
+            toggleBtn.innerHTML = document.querySelector('.success-message') ? 
+                '✨ Send Another Message' : '📨 Send Secure Message to Admin';
+        } else {
+            // Show form
+            messageForm.classList.add('show');
+            toggleBtn.innerHTML = '✖️ Close Message Form';
+        }
+    });
+});
+</script>
+
+{% endblock %}

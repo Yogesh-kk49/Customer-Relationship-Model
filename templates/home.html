@@ -1,0 +1,337 @@
+{% extends "base.html" %}
+
+{% block content %}
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+    
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    body {
+        font-family: 'Inter', sans-serif;
+        background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+        min-height: 100vh;
+    }
+
+    .hero {
+        max-width: 1100px;
+        margin: 60px auto;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 40px;
+        position: relative;
+    }
+
+    .hero-text {
+        max-width: 500px;
+    }
+
+    .hero-text h1 {
+        font-size: 42px;
+        margin-bottom: 15px;
+        color: #111827;
+    }
+
+    .hero-text p {
+        font-size: 18px;
+        color: #4b5563;
+        margin-bottom: 30px;
+    }
+
+    .hero-buttons {
+        display: flex;
+        gap: 15px;
+    }
+
+    .hero-buttons a {
+        display: inline-block;
+        padding: 12px 24px;
+        font-size: 16px;
+        font-weight: 500;
+        border-radius: 6px;
+        text-decoration: none;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .btn-primary {
+        background: #2563eb;
+        color: white;
+        box-shadow: 0 4px 15px rgba(37, 99, 235, 0.2);
+    }
+
+    .btn-primary:hover {
+        background: #1d4ed8;
+        transform: translateY(-3px);
+        box-shadow: 0 8px 25px rgba(37, 99, 235, 0.3);
+    }
+
+    .btn-primary::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+        transition: left 0.5s;
+    }
+
+    .btn-primary:hover::before {
+        left: 100%;
+    }
+
+    .btn-secondary {
+        background: #e5e7eb;
+        color: #111827;
+        border: 2px solid #e5e7eb;
+    }
+
+    .btn-secondary:hover {
+        background: #d1d5db;
+        transform: translateY(-3px);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        border-color: #2563eb;
+    }
+
+    .hero-image {
+        max-width: 400px;
+    }
+
+    .hero-image img {
+        width: 100%;
+        border-radius: 16px;
+        filter: drop-shadow(0 10px 30px rgba(0, 0, 0, 0.1));
+        transition: all 0.4s ease;
+    }
+
+    .hero:hover .hero-image img {
+        transform: scale(1.02);
+        filter: drop-shadow(0 15px 40px rgba(0, 0, 0, 0.15));
+    }
+
+    /* Features Section Styles - Moved HIGHER */
+    .features-section {
+        max-width: 1100px;
+        margin: -25 auto 80px;
+        padding: 0 20px;
+    }
+
+    .section-header {
+        text-align: center;
+        margin-bottom: 30px;
+    }
+
+    .section-title {
+        font-size: 32px;
+        color: #111827;
+        margin-bottom: -5px;
+        font-weight: 700;
+    }
+
+    .info-toggle {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        background: linear-gradient(135deg, #2563eb, #1d4ed8);
+        color: white;
+        padding: 10px 20px;
+        border-radius: 50px;
+        font-size: 15px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(37, 99, 235, 0.3);
+        border: none;
+    }
+
+    .info-toggle:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(37, 99, 235, 0.4);
+    }
+
+    .info-toggle .icon {
+        font-size: 18px;
+        transition: transform 0.3s ease;
+    }
+
+    .info-toggle.active .icon {
+        transform: rotate(180deg);
+    }
+
+    .features-content {
+        max-height: 0;
+        overflow: hidden;
+        transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        opacity: 0;
+    }
+
+    .features-content.active {
+        max-height: 2000px;
+        opacity: 1;
+        margin-top: 24px;
+    }
+
+    .features-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 28px;
+    }
+
+    .feature-card {
+        background: white;
+        padding: 28px 24px;
+        border-radius: 16px;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+        border: 1px solid #f1f5f9;
+        text-align: center;
+        transition: all 0.3s ease;
+    }
+
+    .feature-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 16px 48px rgba(0, 0, 0, 0.12);
+    }
+
+    .feature-icon {
+        width: 60px;
+        height: 60px;
+        margin: 0 auto 16px;
+        background: linear-gradient(135deg, #2563eb, #1d4ed8);
+        border-radius: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 22px;
+    }
+
+    .feature-card h3 {
+        font-size: 20px;
+        color: #111827;
+        margin-bottom: 10px;
+        font-weight: 600;
+    }
+
+    .feature-card p {
+        color: #6b7280;
+        line-height: 1.6;
+        font-size: 14px;
+    }
+
+    @media (max-width: 768px) {
+        .hero {
+            flex-direction: column;
+            text-align: center;
+            margin: 30px auto;
+            gap: 30px;
+        }
+        
+        .hero-buttons {
+            flex-direction: column;
+            width: 100%;
+        }
+        
+        .hero-buttons a {
+            width: 100%;
+            margin-bottom: 10px;
+        }
+
+        .section-title {
+            font-size: 24px;
+        }
+
+        .features-grid {
+            grid-template-columns: 1fr;
+            gap: 20px;
+        }
+
+        .info-toggle {
+            padding: 8px 18px;
+            font-size: 14px;
+        }
+
+        .features-section {
+            margin: 0 auto 60px;
+            padding: 0 16px;
+        }
+    }
+</style>
+
+<div class="hero">
+    <div class="hero-text">
+        <h1>Manage Your Business Smarter</h1>
+        <p>
+            MyCRM helps you manage customers, track activities,
+            and grow your business — all in one place.
+        </p>
+
+        <div class="hero-buttons">
+            <a href="{% url 'accounts:login' %}" class="btn-primary">Login</a>
+            <a href="{% url 'accounts:register' %}" class="btn-secondary">Create Account</a>
+        </div>
+    </div>
+
+    <div class="hero-image">
+        <img src="https://cdn-icons-png.flaticon.com/512/2272/2272810.png" alt="YK CRM Dashboard">
+    </div>
+</div>
+
+<!-- Features Section - Positioned EVEN HIGHER -->
+<div class="features-section">
+    <div class="section-header">
+        <h2 class="section-title">Everything You Need to Know</h2>
+        <button class="info-toggle" onclick="toggleFeatures()">
+            <span class="icon">▼</span>
+            Show Details
+        </button>
+    </div>
+    
+    <div class="features-content" id="featuresContent">
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon">👥</div>
+                <h3>Customer Management</h3>
+                <p>Complete customer profiles with unlimited custom fields, interaction history, notes, documents, and automated follow-up reminders. Import from CSV, Google Contacts, or Outlook.</p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">📊</div>
+                <h3>Smart Analytics</h3>
+                <p>Real-time analytics with 20+ widgets, customizable dashboards, sales funnels, revenue trends, and automated weekly/monthly performance reports sent to your email.</p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">⚡</div>
+                <h3>Lightning Fast</h3>
+                <p>Built with modern tech stack for instant loading, handles 1M+ records, infinite scroll, lazy loading, and works offline with automatic sync when back online.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function toggleFeatures() {
+    const content = document.getElementById('featuresContent');
+    const button = document.querySelector('.info-toggle');
+    
+    content.classList.toggle('active');
+    button.classList.toggle('active');
+    
+    const icon = button.querySelector('.icon');
+    const text = button.querySelector('span:not(.icon)');
+    
+    if (content.classList.contains('active')) {
+        text.textContent = 'Hide Details';
+    } else {
+        text.textContent = 'Show Details';
+    }
+}
+</script>
+
+{% endblock %}

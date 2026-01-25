@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+{% block content %}
+
+<style>
+.container {
+    max-width: 900px;
+    margin: 80px auto;
+    padding: 20px;
+}
+
+.card {
+    background: white;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+}
+
+h2 {
+    margin-bottom: 10px;
+}
+
+p {
+    margin-bottom: 14px;
+    line-height: 1.6;
+}
+
+.back-btn {
+    display: inline-block;
+    margin-bottom: 16px;
+    padding: 8px 16px;
+    background: #dc2626;
+    color: white;
+    border-radius: 6px;
+    text-decoration: none;
+    font-weight: 600;
+}
+.back-btn:hover { background: #b91c1c; }
+</style>
+
+<div class="container">
+
+    <a href="{% url 'accounts:admin_dashboard' %}" class="back-btn">
+        ← Back to Dashboard
+    </a>
+
+    <div class="card">
+        <h2>Terms & Conditions</h2>
+
+        <p>
+            This CRM system is intended for authorized administrative use only.
+        </p>
+
+        <p>
+            Admins are responsible for managing customers, leads, and data securely.
+        </p>
+
+        <p>
+            Unauthorized access, data misuse, or deletion may result in account suspension.
+        </p>
+
+        <p>
+            All activities are logged and monitored for security and audit purposes.
+        </p>
+
+        <p>
+            By using this system, you agree to comply with company policies and data protection laws.
+        </p>
+
+        <p>
+            These terms may be updated without prior notice.
+        </p>
+    </div>
+
+</div>
+
+{% endblock %}

@@ -1,0 +1,106 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+
+<style>
+.container {
+    max-width: 1100px;
+    margin: 80px auto;
+    padding: 20px;
+}
+.card {
+    background: white;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+}
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+th, td {
+    padding: 14px;
+    border-bottom: 1px solid #e5e7eb;
+    text-align: left;
+}
+th {
+    background: #f9fafb;
+    font-weight: 700;
+}
+.badge-admin {
+    color: #1e40af;
+    font-weight: 600;
+}
+.badge-customer {
+    color: #047857;
+    font-weight: 600;
+}
+.back-btn {
+    display: inline-block;
+    margin-bottom: 16px;
+    padding: 8px 16px;
+    background: #dc2626;
+    color: white;
+    border-radius: 6px;
+    text-decoration: none;
+    font-weight: 600;
+}
+.back-btn:hover { background: #b91c1c; }
+</style>
+
+<div class="container">
+
+    <a href="{% url 'accounts:admin_dashboard' %}" class="back-btn">
+        ← Back to Dashboard
+    </a>
+
+    <div class="card">
+        <h2>Activity History</h2>
+        <p>Admin & Customer activity logs</p>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Actor</th>
+                    <th>Role</th>
+                    <th>Action</th>
+                    <th>Customer</th>
+                    <th>Date & Time</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for log in logs %}
+                <tr>
+                    <td>{{ log.actor.username }}</td>
+                    <td>
+                        {% if log.actor.role == "admin" %}
+                            <span class="badge-admin">Admin</️</span>
+                        {% else %}
+                            <span class="badge-customer">Customer</span>
+                        {% endif %}
+                    </td>
+                    <td>{{ log.action }}</td>
+                    <td>
+                        {% if log.customer %}
+                            {{ log.customer.username }}
+                        {% else %}
+                            —
+                        {% endif %}
+                    </td>
+                    <td>{{ log.created_at|date:"d M Y, h:i A" }}</td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="5" style="text-align:center;">
+                        No activity recorded yet.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+</div>
+
+{% endblock %}

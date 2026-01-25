@@ -1,0 +1,714 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+
+<style>
+:root {
+    --primary: #2563eb;
+    --dark: #020617;
+    --dark-light: #111827;
+    --muted: #6b7280;
+    --bg: #f3f4f6;
+    --card: #ffffff;
+    --border: #e5e7eb;
+    --success: #10b981;
+    --danger: #ef4444;
+}
+
+* {
+    box-sizing: border-box;
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+}
+
+body {
+    margin: 0;
+    background: var(--bg);
+}
+
+/* ===== HEADER ===== */
+header {
+    position: fixed;
+    inset: 0 0 auto 0;
+    height: 64px;
+    background: linear-gradient(180deg, var(--dark-light), var(--dark));
+    padding: 0 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    z-index: 1000;
+}
+
+.header-left {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.menu-btn {
+    font-size: 22px;
+    color: #fff;
+    cursor: pointer;
+}
+
+.logo {
+    color: #fff;
+    font-size: 20px;
+    font-weight: 600;
+}
+
+/* ===== HEADER RIGHT ===== */
+.header-right {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    position: relative;
+}
+
+/* 🔔 Bell */
+.bell {
+    position: relative;
+    font-size: 22px;
+    color: #fff;
+    cursor: pointer;
+}
+
+.bell-dot {
+    position: absolute;
+    top: -2px;
+    right: -2px;
+    width: 8px;
+    height: 8px;
+    background: var(--danger);
+    border-radius: 50%;
+    transition: all 0.3s ease;
+    animation: pulse 2s infinite;
+}
+
+.bell-dot.hidden {
+    opacity: 0;
+    transform: scale(0);
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.2); }
+    100% { transform: scale(1); }
+}
+
+/* 🔔 Notification dropdown */
+.notification-box {
+    position: absolute;
+    top: 52px;
+    right: 50px;
+    width: 380px;
+    max-height: calc(100vh - 120px);
+    background: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+    display: none;
+    overflow-y: auto;
+    overflow-x: hidden;
+    z-index: 5000;
+    border: 1px solid var(--border);
+}
+
+.notification-box.active {
+    display: block;
+}
+
+/* Reply form styles */
+.reply-form {
+    background: #f8fafc;
+    padding: 16px;
+    border-top: 1px solid #e5e7eb;
+    display: none;
+}
+
+.reply-form.active {
+    display: block;
+}
+
+.reply-textarea {
+    width: 100%;
+    min-height: 80px;
+    padding: 12px;
+    border: 2px solid #e5e7eb;
+    border-radius: 8px;
+    font-size: 14px;
+    font-family: inherit;
+    resize: vertical;
+    transition: border-color 0.2s;
+}
+
+.reply-textarea:focus {
+    outline: none;
+    border-color: var(--primary);
+}
+
+.reply-buttons {
+    display: flex;
+    gap: 8px;
+    justify-content: flex-end;
+    margin-top: 12px;
+}
+
+.reply-btn {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-send {
+    background: var(--primary);
+    color: white;
+}
+
+.btn-send:hover {
+    background: #1e40af;
+}
+
+.btn-cancel {
+    background: #f3f4f6;
+    color: var(--muted);
+}
+
+.btn-cancel:hover {
+    background: #e5e7eb;
+}
+
+.notification-header {
+    padding: 16px 20px;
+    font-weight: 600;
+    color: #1f2937;
+    background: #f9fafb;
+    border-bottom: 1px solid var(--border);
+    font-size: 15px;
+}
+
+.notification-item {
+    padding: 18px 20px;
+    border-bottom: 1px solid #f3f4f6;
+    cursor: pointer;
+    transition: background 0.2s;
+    position: relative;
+}
+
+.notification-item:hover {
+    background: #f8fafc;
+}
+
+.notification-item:last-child {
+    border-bottom: none;
+}
+
+.notification-item.read {
+    background: #f9fafb;
+    opacity: 0.7;
+}
+
+.notification-username {
+    font-size: 13px;
+    font-weight: 600;
+    color: #2563eb;
+
+    /* 🔑 FIX */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+
+
+.notification-message {
+    font-size: 14px;
+    color: #1f2937;
+    line-height: 1.4;
+    margin-bottom: 4px;
+
+    /* 🔑 FIX */
+    white-space: normal;
+    word-break: normal;
+    overflow-wrap: break-word;
+}
+
+.notification-time {
+    font-size: 12px;
+    color: var(--muted);
+    font-weight: 400;
+    margin: 0;
+}
+
+.reply-btn-container {
+    margin-top: 8px;
+    padding-top: 12px;
+    border-top: 1px solid #f3f4f6;
+}
+
+.reply-toggle {
+    background: none;
+    border: none;
+    color: var(--primary);
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    padding: 4px 8px;
+    border-radius: 4px;
+    transition: background 0.2s;
+}
+
+.reply-toggle:hover {
+    background: #eff6ff;
+}
+
+/* 👈 FIXED: Profile avatar */
+.profile-avatar {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    border: 2px solid var(--primary);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    overflow: hidden;
+    font-size: 12px;
+    font-weight: 700;
+    color: white;
+    background: linear-gradient(135deg, var(--primary), #1e40af);
+    transition: all 0.2s;
+}
+
+.profile-avatar:hover {
+    transform: scale(1.05);
+    box-shadow: 0 5px 15px rgba(37,99,235,0.4);
+}
+
+.profile-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* ===== SIDEBAR ===== */
+.sidebar {
+    position: fixed;
+    top: 64px;
+    left: -260px;
+    width: 260px;
+    height: calc(100vh - 64px);
+    background: var(--dark);
+    padding: 22px;
+    transition: left .3s ease;
+    z-index: 900;
+}
+
+.sidebar.active { 
+    left: 0; 
+}
+
+.sidebar a {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 14px;
+    border-radius: 10px;
+    color: #e5e7eb;
+    text-decoration: none;
+    margin-bottom: 8px;
+}
+
+.sidebar a:hover { 
+    background: #1f2937; 
+}
+
+/* ===== CONTENT ===== */
+.container {
+    margin-top: 80px;
+    margin-left: 24px;
+    margin-right: 24px;
+    transition: margin-left .3s ease;
+}
+
+body.sidebar-open .container {
+    margin-left: 300px;
+}
+
+/* ===== PANELS ===== */
+.panel {
+    background: var(--card);
+    padding: 36px;
+    border-radius: 18px;
+    box-shadow: 0 12px 30px rgba(0,0,0,.08);
+    margin-bottom: 28px;
+}
+
+.panel h1 {
+    font-size: 26px;
+    color: #020617;
+}
+
+.panel p {
+    color: var(--muted);
+}
+
+/* ===== ENHANCED ACTION BUTTONS ===== */
+.action-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 20px;
+    margin-top: 26px;
+}
+
+.action-card {
+    position: relative;
+    background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+    padding: 28px 24px;
+    border-radius: 20px;
+    border: 2px solid transparent;
+    text-decoration: none;
+    color: #020617;
+    text-align: center;
+    font-weight: 600;
+    font-size: 15px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    overflow: hidden;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+}
+
+.action-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+    transition: left 0.6s;
+    z-index: 1;
+}
+
+.action-card:hover::before {
+    left: 100%;
+}
+
+.action-card:hover {
+    transform: translateY(-10px) scale(1.02);
+    border-color: #2563eb;
+    box-shadow: 0 25px 50px rgba(37,99,235,0.2);
+    background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+}
+
+.action-card:active {
+    transform: translateY(-5px) scale(1.01);
+}
+/* 🚨 HARD OVERRIDE: FIX VERTICAL LETTER ISSUE */
+.notification-box {
+    width: 380px !important;
+    min-width: 380px !important;
+    max-width: 380px !important;
+}
+
+/* Safety: prevent flex shrinking */
+.header-right {
+    align-items: stretch;
+}
+
+.notification-item,
+.notification-message,
+.notification-username {
+    width: 100%;
+}
+
+</style>
+
+<!-- ===== HEADER ===== -->
+<header>
+    <div class="header-left">
+        <div class="menu-btn" onclick="toggleSidebar()">☰</div>
+        <div class="logo">MyCRM</div>
+    </div>
+
+    <div class="header-right">
+        <!-- 🔔 Bell - Fixed -->
+        <div class="bell" onclick="toggleNotifications()" id="bellIcon">
+            🔔
+            {% if notifications|length > 0 %}
+                {% with unread_count=notifications|length %}
+                    {% if unread_count > 0 %}
+                        <span class="bell-dot" id="bellDot"></span>
+                    {% endif %}
+                {% endwith %}
+            {% endif %}
+        </div>
+
+        <!-- 🔔 Notifications dropdown -->
+        <div class="notification-box" id="notificationBox">
+            <div class="notification-header">Notifications 
+                {% if notifications|length > 0 %}
+                    <span style="color: var(--primary); font-size: 12px;">({{ notifications|length }})</span>
+                {% endif %}
+            </div>
+            
+            {% if notifications %}
+                {% for note in notifications %}
+                    <div class="notification-item {% if note.is_read %}read{% endif %}" 
+                         id="notification-{{ note.id }}"
+                         data-notification-id="{{ note.id }}">
+                        
+                        <!-- Sender -->
+                        {% if note.sender %}
+                            <div class="notification-username">{{ note.sender.username }}</div>
+                        {% else %}
+                            <div class="notification-username">Admin</div>
+                        {% endif %}
+                        
+                        <!-- Message -->
+                        <div class="notification-message">{{ note.message }}</div>
+                        
+                        <!-- Time -->
+                        <div class="notification-time">
+                            {{ note.created_at|date:"d M Y, h:i A" }}
+                        </div>
+                        
+                        <!-- Reply Button -->
+                        {% if not note.is_read %}
+                            <div class="reply-btn-container">
+                                <button class="reply-toggle" onclick="toggleReply({{ note.id }})">
+                                    💬 Reply
+                                </button>
+                            </div>
+                        {% endif %}
+                        
+                        <!-- Reply Form -->
+                        <div class="reply-form" id="reply-form-{{ note.id }}">
+                            <textarea class="reply-textarea" 
+                                      placeholder="Type your reply here..." 
+                                      id="reply-text-{{ note.id }}"></textarea>
+                            <div class="reply-buttons">
+                                <button class="reply-btn btn-cancel" onclick="cancelReply({{ note.id }})">
+                                    Cancel
+                                </button>
+                                <button class="reply-btn btn-send" onclick="sendReply({{ note.id }})">
+                                    Send Reply
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <div class="notification-item">
+                    <div class="notification-message">No new notifications</div>
+                </div>
+            {% endif %}
+        </div>
+
+        <!-- 👈 FIXED: Profile avatar -->
+        <a href="{% url 'accounts:customer_profile' %}" class="profile-avatar">
+            {% if customer.profile_photo %}
+                <img src="{{ customer.profile_photo.url }}" alt="Profile">
+            {% else %}
+                {{ user.username|slice:":2"|upper }}
+            {% endif %}
+        </a>
+    </div>
+</header>
+
+<!-- ===== SIDEBAR ===== -->
+<div class="sidebar" id="sidebar">
+    <a href="{% url 'accounts:customer_history' %}">📜 History</a>
+    <a href="{% url 'accounts:customer_help' %}">❓ Help</a>
+    <a href="{% url 'accounts:customer_terms' %}">📄 Terms & Conditions</a>
+</div>
+
+<!-- ===== CONTENT ===== -->
+<div class="container">
+    <div class="panel">
+        <h1>Welcome, {{ request.user.username }}</h1>
+        <p>
+            This is your customer dashboard. Manage your business profile,
+            documents, and support requests from a single place.
+        </p>
+    </div>
+
+    <div class="panel">
+        <h1>Quick Actions</h1>
+
+        <div class="action-grid">
+            <a href="{% url 'accounts:customer_business_profile' %}" class="action-card">
+                🏢 Manage Business Profile
+            </a>
+
+            {% if request.user.role == "customer" %}
+            <a href="{% url 'documents:customer_documents' %}" class="action-card">
+                📂 View / Upload Documents
+            </a>
+            {% elif request.user.role == "admin" %}
+            <a href="{% url 'documents:admin_all_documents' %}" class="action-card">
+                📂 Manage Documents
+            </a>
+            {% endif %}
+
+            <a href="{% url 'accounts:contact_admin' %}" class="action-card">
+                🎫 Contact Admin
+            </a>
+
+            <a href="{% url 'accounts:customer_profile' %}" class="action-card">
+                👤 View Profile
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- CSRF Token for AJAX (hidden) -->
+{% csrf_token %}
+
+<script>
+let replyForms = {};
+
+function toggleSidebar() {
+    document.getElementById("sidebar").classList.toggle("active");
+    document.body.classList.toggle("sidebar-open");
+}
+
+function toggleNotifications() {
+    const box = document.getElementById("notificationBox");
+    box.classList.toggle("active");
+    
+    // Mark all notifications as read when opened
+    markAllNotificationsRead();
+}
+
+function markNotificationRead(notificationId) {
+    const notificationEl = document.getElementById(`notification-${notificationId}`);
+    const bellDot = document.getElementById('bellDot');
+    
+    if (notificationEl) {
+        notificationEl.classList.add('read');
+    }
+    
+    if (bellDot) {
+        bellDot.classList.add('hidden');
+        setTimeout(() => {
+            bellDot.style.display = 'none';
+        }, 300);
+    }
+    
+    // AJAX call
+    sendMarkReadRequest(notificationId);
+}
+
+function markAllNotificationsRead() {
+    // Mark all notifications as read visually
+    document.querySelectorAll('.notification-item').forEach(item => {
+        item.classList.add('read');
+    });
+    
+    const bellDot = document.getElementById('bellDot');
+    if (bellDot) {
+        bellDot.classList.add('hidden');
+        setTimeout(() => {
+            bellDot.style.display = 'none';
+        }, 300);
+    }
+    
+    // AJAX call for all notifications
+    const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').getAttribute('value');
+    fetch('/accounts/mark-all-notifications-read/', {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': csrfToken,
+            'Content-Type': 'application/json',
+        }
+    }).catch(error => console.log('All notifications marked as read'));
+}
+
+function toggleReply(notificationId) {
+    const form = document.getElementById(`reply-form-${notificationId}`);
+    form.classList.toggle('active');
+}
+
+function cancelReply(notificationId) {
+    const form = document.getElementById(`reply-form-${notificationId}`);
+    const textarea = document.getElementById(`reply-text-${notificationId}`);
+    form.classList.remove('active');
+    textarea.value = '';
+}
+
+async function sendReply(notificationId) {
+    const textarea = document.getElementById(`reply-text-${notificationId}`);
+    const message = textarea.value.trim();
+    
+    if (!message) {
+        alert('Please enter a reply message');
+        return;
+    }
+    
+    const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').getAttribute('value');
+    
+    try {
+        const response = await fetch('/accounts/send-reply/', {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': csrfToken,
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                notification_id: notificationId,
+                message: message
+            })
+        });
+        
+        if (response.ok) {
+            // Success - hide form and show success
+            cancelReply(notificationId);
+            markNotificationRead(notificationId);
+            
+            // Show success message in notification
+            const notificationEl = document.getElementById(`notification-${notificationId}`);
+            const replyBtnContainer = notificationEl.querySelector('.reply-btn-container');
+            replyBtnContainer.innerHTML = '<span style="color: var(--success); font-size: 12px;">✅ Reply sent!</span>';
+        } else {
+            alert('Failed to send reply. Please try again.');
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        alert('Error sending reply. Please try again.');
+    }
+}
+
+function sendMarkReadRequest(notificationId) {
+    const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').getAttribute('value');
+    fetch(`/accounts/mark-notification-read/${notificationId}/`, {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': csrfToken,
+            'Content-Type': 'application/json',
+        }
+    }).catch(error => console.log('Notification marked as read'));
+}
+
+// Close notifications when clicking outside
+document.addEventListener("click", function(e) {
+    const bell = document.querySelector(".bell");
+    const box = document.getElementById("notificationBox");
+    if (!bell.contains(e.target) && !box.contains(e.target)) {
+        box.classList.remove("active");
+    }
+});
+
+// Auto-hide bell dot if no unread notifications on page load
+document.addEventListener("DOMContentLoaded", function() {
+    const unreadNotifications = document.querySelectorAll('.notification-item:not(.read)');
+    const bellDot = document.getElementById('bellDot');
+    
+    if (unreadNotifications.length === 0 && bellDot) {
+        bellDot.style.display = 'none';
+    }
+});
+</script>
+
+{% endblock %}

@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+{% block content %}
+
+<style>
+.container {
+    max-width: 900px;
+    margin: 80px auto;
+    padding: 20px;
+}
+
+.card {
+    background: white;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+}
+
+h2 {
+    margin-bottom: 10px;
+}
+
+ul {
+    margin-top: 15px;
+    padding-left: 20px;
+}
+
+li {
+    margin-bottom: 10px;
+}
+
+.back-btn {
+    display: inline-block;
+    margin-bottom: 16px;
+    padding: 8px 16px;
+    background: #dc2626;
+    color: white;
+    border-radius: 6px;
+    text-decoration: none;
+    font-weight: 600;
+}
+.back-btn:hover { background: #b91c1c; }
+</style>
+
+<div class="container">
+
+    <a href="{% url 'accounts:admin_dashboard' %}" class="back-btn">
+        ← Back to Dashboard
+    </a>
+
+    <div class="card">
+        <h2>Help & Support</h2>
+        <p>Welcome to the MyCRM Admin Help section.</p>
+
+        <ul>
+            <li><strong>Create Customer:</strong> Use “Create New Customer” to onboard users.</li>
+            <li><strong>View Customers:</strong> Click “View” to see customer business details.</li>
+            <li><strong>Delete Customer:</strong> Deletes customer permanently.</li>
+            <li><strong>Leads:</strong> Manage leads and convert them to customers.</li>
+            <li><strong>Profile:</strong> Update admin profile and password securely.</li>
+            <li><strong>History:</strong> Track all admin and customer actions.</li>
+        </ul>
+
+        <p>If you face issues, contact system administrator.</p>
+    </div>
+
+</div>
+
+{% endblock %}

@@ -1,0 +1,353 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+
+<link rel="stylesheet" href="https://unpkg.com/cropperjs@1.6.1/dist/cropper.css">
+
+<style>
+.container {
+    max-width: 1000px;
+    margin: 60px auto;
+}
+
+.top-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+    gap: 12px;
+}
+
+.top-actions {
+    display: flex;
+    gap: 10px;
+}
+
+/* 🔴 RED BUTTONS */
+.back-btn,
+.logout-btn {
+    background: #dc2626;
+    color: white;
+    padding: 8px 18px;
+    border-radius: 6px;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.back-btn:hover,
+.logout-btn:hover {
+    background: #b91c1c;
+}
+
+/* Grid */
+.profile-grid {
+    display: grid;
+    grid-template-columns: 2fr 1.2fr;
+    gap: 25px;
+    align-items: stretch;
+}
+
+@media (max-width: 900px) {
+    .profile-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Card */
+.card {
+    background: #fff;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+    display: flex;
+    flex-direction: column;
+}
+
+/* 👈 FIXED: Profile photo/avatar */
+.profile-photo,
+.profile-placeholder {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    border: 3px solid #2563eb;
+    margin: 0 auto 15px auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 32px;
+    font-weight: 700;
+    color: white;
+    background: linear-gradient(135deg, #2563eb, #1e40af);
+    object-fit: cover;
+}
+
+.profile-placeholder {
+    text-transform: uppercase;
+}
+
+/* Inputs */
+label {
+    font-weight: 600;
+    margin-top: 14px;
+    display: block;
+}
+
+input {
+    width: 100%;
+    padding: 10px;
+    margin-top: 6px;
+    border-radius: 6px;
+    border: 1px solid #d1d5db;
+}
+
+input:disabled {
+    background: #f3f4f6;
+}
+
+/* Buttons */
+.btn {
+    margin-top: 20px;
+    padding: 12px;
+    background: #2563eb;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+    width: 100%;
+}
+
+.btn-danger {
+    background: #dc2626;
+}
+
+/* Push buttons to bottom */
+.card-footer {
+    margin-top: auto;
+}
+
+/* Messages */
+.msg-success {
+    background: #dcfce7;
+    color: #166534;
+    padding: 12px;
+    border-radius: 6px;
+    margin-bottom: 15px;
+}
+
+.msg-error {
+    background: #fee2e2;
+    color: #991b1b;
+    padding: 12px;
+    border-radius: 6px;
+    margin-bottom: 15px;
+}
+
+/* Security */
+.security-title {
+    font-size: 18px;
+    font-weight: 700;
+}
+
+.security-desc {
+    font-size: 13px;
+    color: #6b7280;
+    margin-bottom: 20px;
+}
+
+/* Cropper */
+#uploadSection {
+    display: none;
+    margin-top: 15px;
+}
+
+.crop-wrapper {
+    width: 260px;
+    height: 260px;
+    margin: 0 auto;
+}
+
+.cropper-view-box,
+.cropper-face {
+    border-radius: 50%;
+}
+
+.toggle-pass {
+    font-size: 13px;
+    color: #2563eb;
+    cursor: pointer;
+    margin-top: 8px;
+    display: inline-block;
+}
+
+/* Password button alignment */
+#togglePasswordBtn {
+    margin-top: 20px;
+}
+</style>
+
+<div class="container">
+    <!-- TOP BAR -->
+    <div class="top-bar">
+        <h2>Customer Profile</h2>
+
+        <div class="top-actions">
+            <a href="{% url 'accounts:customer_dashboard' %}" class="back-btn">← Back</a>
+            <a href="{% url 'accounts:logout' %}" class="logout-btn" onclick="return confirm('Are you sure you want to logout?')">🚪 Logout</a>
+        </div>
+    </div>
+
+    <!-- MESSAGES -->
+    {% for message in messages %}
+        {% if 'profile' in message.tags %}
+            <div class="msg-{{ message.level_tag }}">
+                {{ message }}
+            </div>
+        {% endif %}
+    {% endfor %}
+
+    <form method="post" id="profileForm">
+        {% csrf_token %}
+        <input type="hidden" name="cropped_image" id="croppedImage">
+
+        <div class="profile-grid">
+            <!-- LEFT : UPDATE PROFILE -->
+            <div class="card">
+                {% if profile.profile_photo %}
+                    <img src="{{ profile.profile_photo.url }}" class="profile-photo" alt="Profile">
+                {% else %}
+                    <div class="profile-placeholder">
+                        {{ request.user.username|slice:":2"|upper }}
+                    </div>
+                {% endif %}
+
+                <label>Profile Photo</label>
+                <input type="file" id="imageInput" accept="image/*">
+
+                <div id="uploadSection">
+                    <div class="crop-wrapper">
+                        <img id="preview">
+                    </div>
+                </div>
+
+                <label>Username</label>
+                <input type="text" value="{{ request.user.username }}" disabled>
+
+                <label>Email</label>
+                <input type="email" name="email" value="{{ request.user.email }}">
+
+                <label>Mobile Number</label>
+                <input type="tel"
+                       name="mobile"
+                       value="{{ profile.mobile }}"
+                       pattern="[0-9]{10}"
+                       maxlength="10">
+
+                <div class="card-footer">
+                    <button class="btn" type="submit">
+                        Save Profile Changes
+                    </button>
+                </div>
+            </div>
+
+            <!-- RIGHT : CHANGE PASSWORD -->
+            <div class="card">
+                <div class="security-title">Account Security</div>
+                <div class="security-desc">
+                    Update your password to keep your account secure
+                </div>
+
+                <button type="button" class="btn" id="togglePasswordBtn">
+                    Change Password
+                </button>
+
+                <div id="passwordFields" style="display:none;">
+                    <label>Current Password</label>
+                    <input type="password" name="current_password">
+
+                    <label>New Password</label>
+                    <input type="password" name="new_password">
+
+                    <label>Confirm New Password</label>
+                    <input type="password" name="confirm_password">
+
+                    <span class="toggle-pass" onclick="togglePassword()">
+                        👁 Show / Hide Passwords
+                    </span>
+
+                    
+                        <button class="btn btn-danger" type="submit">
+                            Update Password
+                        </button>
+                
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+<script src="https://unpkg.com/cropperjs@1.6.1/dist/cropper.js"></script>
+
+<script>
+let cropper;
+const imageInput = document.getElementById("imageInput");
+const preview = document.getElementById("preview");
+const uploadSection = document.getElementById("uploadSection");
+const croppedImageInput = document.getElementById("croppedImage");
+
+imageInput.addEventListener("change", function () {
+    const file = this.files[0];
+    if (!file) return;
+
+    uploadSection.style.display = "block";
+
+    const reader = new FileReader();
+    reader.onload = () => {
+        preview.src = reader.result;
+        preview.onload = () => {
+            if (cropper) cropper.destroy();
+            cropper = new Cropper(preview, {
+                aspectRatio: 1,
+                viewMode: 1,
+                dragMode: "move",
+                cropBoxResizable: false,
+                cropBoxMovable: false,
+            });
+        };
+    };
+    reader.readAsDataURL(file);
+});
+
+document.getElementById("profileForm").addEventListener("submit", function (e) {
+    if (cropper) {
+        e.preventDefault();
+        cropper.getCroppedCanvas({ width: 300, height: 300 })
+            .toBlob(blob => {
+                const reader = new FileReader();
+                reader.onloadend = () => {
+                    croppedImageInput.value = reader.result;
+                    this.submit();
+                };
+                reader.readAsDataURL(blob);
+            });
+    }
+});
+
+function togglePassword() {
+    document.querySelectorAll('#passwordFields input').forEach(i => {
+        i.type = i.type === "password" ? "text" : "password";
+    });
+}
+
+const btn = document.getElementById("togglePasswordBtn");
+const fields = document.getElementById("passwordFields");
+
+btn.addEventListener("click", () => {
+    const open = fields.style.display === "block";
+    fields.style.display = open ? "none" : "block";
+    btn.textContent = open ? "Change Password" : "Cancel Password Change";
+    btn.classList.toggle("btn-danger", !open);
+});
+</script>
+
+{% endblock %}

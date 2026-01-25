@@ -1,0 +1,491 @@
+{% extends "base.html" %}
+
+{% block header_right %}
+{% endblock %}
+
+{% block content %}
+{% if messages %}
+    {% for message in messages %}
+        <div style="
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+            padding: 24px;
+            border-radius: 16px;
+            margin: 20px 0;
+            text-align: center;
+            font-weight: 600;
+            box-shadow: 0 20px 40px rgba(16,185,129,0.3);
+            animation: slideDown 0.5s ease-out;
+        ">
+             {{ message }}
+        </div>
+    {% endfor %}
+{% endif %}
+
+<style>
+    /* Your existing styles remain EXACTLY the same */
+    .page-wrapper {
+        max-width: 1100px;
+        margin: 60px auto;
+    }
+
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 30px;
+        gap: 12px;
+    }
+
+    .page-header h2 {
+        font-size: 26px;
+        font-weight: 600;
+        color: #1f2937;
+    }
+
+    .header-actions {
+        display: flex;
+        gap: 12px;
+    }
+
+    .back-btn {
+        padding: 10px 18px;
+        background: #dc2626;
+        color: white;
+        text-decoration: none;
+        border-radius: 6px;
+        font-size: 14px;
+        font-weight: 600;
+    }
+
+    .back-btn:hover {
+        background: #b91c1c;
+    }
+
+    .message-btn {
+        padding: 10px 18px;
+        background: #2563eb;
+        color: white;
+        text-decoration: none;
+        border-radius: 6px;
+        font-size: 14px;
+        font-weight: 600;
+    }
+
+    .message-btn:hover {
+        background: #1e40af;
+    }
+
+    /* Enhanced success message styles (added close button support) */
+    .success-message {
+        background: #10b981;
+        color: white;
+        padding: 16px 20px;
+        border-radius: 8px;
+        margin-bottom: 25px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+        animation: slideDown 0.4s ease-out;
+        font-weight: 500;
+    }
+
+    .success-message .close-btn {
+        margin-left: auto;
+        background: none;
+        border: none;
+        color: white;
+        font-size: 20px;
+        cursor: pointer;
+        padding: 0 8px;
+        line-height: 1;
+    }
+
+    .success-message .close-btn:hover {
+        background: rgba(255,255,255,0.2);
+        border-radius: 4px;
+    }
+
+    @keyframes slideDown {
+        from {
+            opacity: 0;
+            transform: translateY(-10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    /* Rest of your existing styles unchanged */
+    .avatar-wrapper {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        margin-bottom: 20px;
+    }
+
+    .avatar {
+        width: 72px;
+        height: 72px;
+        border-radius: 50%;
+        background: #2563eb;
+        color: white;
+        font-size: 28px;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+    }
+
+    .avatar img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .avatar-info .name {
+        font-size: 20px;
+        font-weight: 600;
+        color: #1f2937;
+    }
+
+    .avatar-info .email {
+        font-size: 14px;
+        color: #6b7280;
+    }
+
+    .grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 25px;
+    }
+
+    .card {
+        background: #ffffff;
+        border-radius: 12px;
+        padding: 25px;
+        box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+    }
+
+    .card h3 {
+        margin-bottom: 18px;
+        color: #1f2937;
+    }
+
+    .info-row {
+        margin-bottom: 14px;
+    }
+
+    .label {
+        font-weight: 600;
+        color: #374151;
+    }
+
+    .value {
+        color: #4b5563;
+        margin-top: 4px;
+    }
+
+    .chart-container {
+        position: relative;
+        height: 320px;
+        width: 100%;
+    }
+
+    .live-data {
+        padding: 12px;
+        background: #f8fafc;
+        border-radius: 8px;
+        margin-bottom: 16px;
+        font-size: 14px;
+    }
+
+    .doc-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 10px;
+    }
+
+    .doc-table th,
+    .doc-table td {
+        padding: 12px;
+        text-align: left;
+        border-top: 1px solid #e5e7eb;
+    }
+
+    .doc-table th {
+        background: #f9fafb;
+        font-size: 14px;
+        color: #374151;
+    }
+
+    .doc-link {
+        color: #2563eb;
+        font-weight: 600;
+        text-decoration: none;
+        margin-right: 12px;
+    }
+
+    .doc-link:hover {
+        text-decoration: underline;
+    }
+
+    .download-btn {
+        padding: 6px 12px;
+        background: #16a34a;
+        color: white;
+        border-radius: 6px;
+        font-size: 13px;
+        font-weight: 600;
+        text-decoration: none;
+    }
+
+    .download-btn:hover {
+        background: #15803d;
+    }
+</style>
+
+<!-- ADD THIS SUCCESS MESSAGE BLOCK (right after page-wrapper div opens) -->
+<div class="page-wrapper">
+    {% if message_sent %}
+    <div class="success-message" id="successMsg">
+        <span>✅ Message sent successfully to {{ customer.user.username }}!</span>
+        <button class="close-btn" onclick="closeSuccessMsg()">×</button>
+    </div>
+    {% endif %}
+
+    <!-- Your existing content unchanged -->
+    <div class="page-header">
+        <h2>Customer Overview</h2>
+        <div class="header-actions">
+            <a href="{% url 'accounts:admin_send_message' profile.user.id %}" class="message-btn">
+                ✉️ Send Message
+            </a>
+            <a href="{% url 'accounts:admin_dashboard' %}" class="back-btn">
+                ← Back
+            </a>
+        </div>
+    </div>
+
+    <div class="avatar-wrapper">
+        {% if customer.profile_photo %}
+            <div class="avatar">
+                <img src="{{ customer.profile_photo.url }}" alt="Profile">
+            </div>
+        {% else %}
+            <div class="avatar">
+                {{ customer.user.username|slice:":2"|upper }}
+            </div>
+        {% endif %}
+
+        <div class="avatar-info">
+            <div class="name">{{ customer.user.username }}</div>
+            <div class="email">{{ customer.user.email }}</div>
+        </div>
+    </div>
+
+    <div class="grid">
+        <div class="card">
+            <h3>Customer Information</h3>
+
+            <div class="info-row">
+                <div class="label">Business Type</div>
+                <div class="value">{{ profile.business_type|default:"—" }}</div>
+            </div>
+
+            <div class="info-row">
+                <div class="label">Investment</div>
+                <div class="value">₹ {{ profile.investment|floatformat:0|default:"0" }}</div>
+            </div>
+
+            <div class="info-row">
+                <div class="label">Expected Profit</div>
+                <div class="value">₹ {{ profile.expected_profit|floatformat:0|default:"0" }}</div>
+            </div>
+
+            <div class="info-row">
+                <div class="label">Actual Profit</div>
+                <div class="value">₹ {{ profile.actual_profit|floatformat:0|default:"0" }}</div>
+            </div>
+
+            <div class="info-row">
+                <div class="label">Timeline</div>
+                <div class="value">
+                    {{ profile.start_date|date:"d M Y"|default:"—" }} →
+                    {{ profile.end_date|date:"d M Y"|default:"—" }}
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3>Business Overview</h3>
+            <div class="live-data">
+                <strong>Investment:</strong> ₹{{ profile.investment|floatformat:0|default:"0" }}<br>
+                <strong>Expected:</strong> ₹{{ profile.expected_profit|floatformat:0|default:"0" }}<br>
+                <strong>Actual:</strong> ₹{{ profile.actual_profit|floatformat:0|default:"0" }}
+            </div>
+            <div class="chart-container">
+                <canvas id="businessChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <div class="card" style="margin-top:30px;">
+        <h3>Uploaded Documents</h3>
+
+        {% if documents %}
+            <table class="doc-table">
+                <thead>
+                    <tr>
+                        <th>Title</th>
+                        <th>Uploaded At</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for doc in documents %}
+                    <tr>
+                        <td>{{ doc.title }}</td>
+                        <td>{{ doc.created_at|date:"d M Y, h:i A" }}</td>
+                        <td>
+                            <a href="{{ doc.document_file.url }}" target="_blank" class="doc-link">
+                                👁️ View
+                            </a>
+                            <a href="{{ doc.document_file.url }}" download class="download-btn">
+                                ⬇️ Download
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <p style="color:#6b7280; font-style:italic;">No documents uploaded by this customer.</p>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Your existing script unchanged + success message JS added -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    console.log("🔄 Customer Overview Chart - Initializing...");
+    
+    // Auto-hide success message after 5 seconds
+    const successMsg = document.getElementById("successMsg");
+    if (successMsg) {
+        setTimeout(function() {
+            successMsg.style.opacity = '0';
+            successMsg.style.transform = 'translateY(-10px)';
+            setTimeout(() => successMsg.remove(), 300);
+        }, 5000);
+    }
+    
+    const ctx = document.getElementById("businessChart");
+    if (!ctx) {
+        console.log("❌ Chart canvas not found");
+        return;
+    }
+
+    const startDateRaw = "{{ profile.start_date|date:'Y-m-d'|default:'' }}";
+    const endDateRaw = "{{ profile.end_date|date:'Y-m-d'|default:'' }}";
+    const expectedProfitRaw = "{{ profile.expected_profit|default:'0' }}";
+    const actualProfitRaw = "{{ profile.actual_profit|default:'0' }}";
+
+    const expectedProfit = parseFloat(expectedProfitRaw.replace(/[^\d.-]/g, '')) || 0;
+    const actualProfit = parseFloat(actualProfitRaw.replace(/[^\d.-]/g, '')) || 0;
+
+    let labels = [];
+    let expectedData = [];
+    let actualData = [];
+
+    // Generate timeline chart if dates available
+    if (startDateRaw && endDateRaw) {
+        const start = new Date(startDateRaw);
+        const end = new Date(endDateRaw);
+        const months = (end.getFullYear() - start.getFullYear()) * 12 +
+                      (end.getMonth() - start.getMonth()) + 1;
+
+        if (months > 0) {
+            const expectedMonthly = expectedProfit / months;
+            const actualMonthly = actualProfit / months;
+
+            for (let i = 0; i < months; i++) {
+                const date = new Date(start);
+                date.setMonth(date.getMonth() + i);
+                labels.push(date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' }));
+                expectedData.push(Math.round(expectedMonthly));
+                actualData.push(Math.round(actualMonthly));
+            }
+        }
+    }
+
+    // Fallback to simple bar chart
+    if (labels.length === 0) {
+        labels = ["Expected", "Actual"];
+        expectedData = [expectedProfit, 0];
+        actualData = [0, actualProfit];
+    }
+
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [
+                {
+                    label: 'Expected Profit (₹)',
+                    data: expectedData,
+                    backgroundColor: 'rgba(37, 99, 235, 0.8)',
+                    borderColor: '#2563eb',
+                    borderWidth: 2,
+                    borderRadius: 8
+                },
+                {
+                    label: 'Actual Profit (₹)',
+                    data: actualData,
+                    backgroundColor: 'rgba(22, 163, 74, 0.8)',
+                    borderColor: '#16a34a',
+                    borderWidth: 2,
+                    borderRadius: 8
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        callback: value => '₹' + value.toLocaleString('en-IN')
+                    }
+                }
+            },
+            plugins: {
+                legend: {
+                    display: true,
+                    position: 'top'
+                }
+            }
+        }
+    });
+    
+    console.log("✅ Business chart rendered successfully");
+});
+
+// Close success message function
+function closeSuccessMsg() {
+    const msg = document.getElementById("successMsg");
+    if (msg) {
+        msg.style.transition = 'all 0.3s ease';
+        msg.style.opacity = '0';
+        msg.style.transform = 'translateY(-10px)';
+        setTimeout(() => msg.remove(), 300);
+    }
+}
+</script>
+
+{% endblock %}

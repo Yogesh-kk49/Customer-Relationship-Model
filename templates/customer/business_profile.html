@@ -1,0 +1,299 @@
+{% extends "base.html" %}
+{% block content %}
+
+<style>
+* { box-sizing: border-box; font-family: 'Segoe UI', system-ui, sans-serif; }
+body { margin: 0; background: #f3f4f6; min-height: 100vh; }
+
+.container { 
+    max-width: 1200px; 
+    margin: 40px auto; 
+    position: relative; 
+}
+.dashboard-wrapper { 
+    display: grid; 
+    grid-template-columns: 1fr 1fr; 
+    gap: 24px; 
+    width: 100%;
+}
+
+.back-btn {
+    position: absolute; top: 0; right: 0;
+    background: #dc2626; color: white; border: none;
+    padding: 12px 20px; border-radius: 8px; cursor: pointer;
+    font-weight: 500; text-decoration: none; display: inline-flex;
+    align-items: center; gap: 8px; box-shadow: 0 4px 12px rgba(220,38,38,0.3);
+    transition: all 0.2s; font-size: 14px; z-index: 10;
+}
+.back-btn:hover { background: #b91c1c; transform: translateY(-1px); }
+
+.card { 
+    background: #ffffff; padding: 24px; border-radius: 14px; 
+    box-shadow: 0 10px 28px rgba(0,0,0,0.08); 
+    display: flex; flex-direction: column; gap: 16px; 
+}
+h2 { margin: 0; font-size: 20px; color: #1f2937; }
+.note { background: #eff6ff; color: #1e40af; padding: 12px; border-radius: 8px; border-left: 4px solid #2563eb; }
+
+/* FORM STYLES */
+.form-group { margin-bottom: 20px; }
+.form-group label { font-weight: 600; display: block; margin-bottom: 6px; color: #374151; }
+.form-input, .date-input {
+    width: 100%; padding: 12px; border: 1px solid #d1d5db; border-radius: 8px;
+    font-size: 14px; transition: border-color 0.2s;
+}
+.form-input:focus, .date-input:focus { 
+    outline: none; border-color: #2563eb; box-shadow: 0 0 0 3px rgba(37,99,235,0.1); 
+}
+.date-row { display: flex; gap: 12px; }
+.date-input { flex: 1; }
+
+button { 
+    background: #2563eb; color: white; border: none; padding: 12px 24px; 
+    border-radius: 8px; cursor: pointer; font-weight: 500; margin-top: 8px; 
+}
+button:hover { background: #1e40af; }
+
+.chart-wrapper { flex: 1; min-height: 320px; position: relative; }
+canvas { width: 100% !important; height: 100% !important; }
+
+/* ERROR & SUCCESS */
+.error-message { 
+    background: #fee2e2; color: #991b1b; padding: 12px; border-radius: 8px; 
+    border-left: 4px solid #dc2626; margin-bottom: 16px; font-size: 14px;
+}
+.field-errors { color: #dc2626; font-size: 13px; margin-top: 4px; }
+.success-message { 
+    background: #d1fae5 !important; color: #065f46 !important; padding: 16px !important; 
+    border-radius: 8px !important; border-left: 4px solid #10b981 !important; 
+    margin-bottom: 24px !important; font-weight: 500 !important; 
+}
+
+/* RESPONSIVE DESIGN */
+@media (max-width: 768px) {
+    .container { margin: 20px 16px; }
+    .dashboard-wrapper { 
+        grid-template-columns: 1fr; 
+        gap: 16px; 
+    }
+    .back-btn { 
+        position: static; 
+        margin-bottom: 16px; 
+        justify-content: center; 
+        width: 100%; 
+    }
+}
+</style>
+
+<a href="{% url 'accounts:customer_dashboard' %}" class="back-btn" title="Back to Dashboard">← Back</a>
+
+<div class="container">
+    <!-- SUCCESS MESSAGES -->
+    {% if messages %}
+        {% for message in messages %}
+            <div class="success-message">{{ message }}</div>
+        {% endfor %}
+    {% endif %}
+
+    <!-- FORM ERRORS -->
+    {% if form.non_field_errors %}
+        <div class="error-message">
+            {% for error in form.non_field_errors %}
+                {{ error }}
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <div class="dashboard-wrapper">
+        <!-- LEFT: FORM -->
+        <div class="card">
+            <h2>Business Profile</h2>
+            <div class="note">ℹ️ Profit values are used only for analytics & growth tracking.</div>
+            
+            <form method="post">
+                {% csrf_token %}
+                
+                <div class="form-group">
+                    {{ form.business_type.label_tag }}
+                    {{ form.business_type }}
+                    {% if form.business_type.errors %}
+                        <div class="field-errors">
+                            {% for error in form.business_type.errors %}{{ error }}{% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <div class="form-group">
+                    {{ form.investment.label_tag }}
+                    {{ form.investment }}
+                    {% if form.investment.errors %}
+                        <div class="field-errors">
+                            {% for error in form.investment.errors %}{{ error }}{% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <div class="form-group">
+                    {{ form.expected_profit.label_tag }}
+                    {{ form.expected_profit }}
+                    {% if form.expected_profit.errors %}
+                        <div class="field-errors">
+                            {% for error in form.expected_profit.errors %}{{ error }}{% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <div class="form-group">
+                    {{ form.actual_profit.label_tag }}
+                    {{ form.actual_profit }}
+                    {% if form.actual_profit.errors %}
+                        <div class="field-errors">
+                            {% for error in form.actual_profit.errors %}{{ error }}{% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <div class="form-group">
+                    <label>Timeline</label>
+                    <div class="date-row">
+                        {{ form.start_date }}
+                        {{ form.end_date }}
+                    </div>
+                    {% if form.start_date.errors %}
+                        <div class="field-errors">{{ form.start_date.errors|join:", " }}</div>
+                    {% endif %}
+                    {% if form.end_date.errors %}
+                        <div class="field-errors">{{ form.end_date.errors|join:", " }}</div>
+                    {% endif %}
+                </div>
+
+                <button type="submit">💾 Save Changes</button>
+            </form>
+        </div>
+
+        <!-- RIGHT: CHART -->
+        <div class="card">
+            <h2>Profit Overview</h2>
+            <!-- LIVE DATA DISPLAY -->
+            <div style="padding: 12px; background: #f8fafc; border-radius: 8px; margin-bottom: 16px;">
+                <strong>Investment:</strong> ₹{{ profile.investment|floatformat:0|default:"0" }}<br>
+                <strong>Expected Profit:</strong> ₹{{ profile.expected_profit|floatformat:0|default:"0" }}<br>
+                <strong>Actual Profit:</strong> ₹{{ profile.actual_profit|floatformat:0|default:"0" }}
+            </div>
+            <div class="chart-wrapper">
+                <canvas id="profitChart"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- CHART.JS - BULLETPROOF VERSION -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    console.log("🔄 Initializing Customer Business Profile Chart...");
+    
+    const ctx = document.getElementById("profitChart");
+    if (!ctx) {
+        console.error("❌ Canvas 'profitChart' not found!");
+        return;
+    }
+    
+    // BULLETPROOF Decimal parsing from Django
+    const startDateRaw = "{{ profile.start_date|date:'Y-m-d'|default:'' }}";
+    const endDateRaw = "{{ profile.end_date|date:'Y-m-d'|default:'' }}";
+    
+    const expectedProfitRaw = "{{ profile.expected_profit|default:'0' }}";
+    const actualProfitRaw = "{{ profile.actual_profit|default:'0' }}";
+    
+    // Clean parsing - handles DecimalField output perfectly
+    const expectedProfit = parseFloat(expectedProfitRaw.replace(/[^\d.-]/g, '')) || 0;
+    const actualProfit = parseFloat(actualProfitRaw.replace(/[^\d.-]/g, '')) || 0;
+    
+    console.log("📊 Chart Data:");
+    console.log("- Expected Profit:", expectedProfitRaw, "→", expectedProfit);
+    console.log("- Actual Profit:", actualProfitRaw, "→", actualProfit);
+    console.log("- Start Date:", startDateRaw);
+    console.log("- End Date:", endDateRaw);
+    
+    let labels = [];
+    let expectedData = [];
+    let actualData = [];
+    
+    // Timeline chart if dates exist
+    if (startDateRaw && endDateRaw && startDateRaw !== '' && endDateRaw !== '') {
+        const start = new Date(startDateRaw);
+        const end = new Date(endDateRaw);
+        const months = (end.getFullYear() - start.getFullYear()) * 12 + 
+                      (end.getMonth() - start.getMonth()) + 1;
+        
+        if (months > 0 && !isNaN(months)) {
+            const expectedMonthly = expectedProfit / months;
+            const actualMonthly = actualProfit / months;
+            
+            for (let i = 0; i < months; i++) {
+                const date = new Date(start);
+                date.setMonth(date.getMonth() + i);
+                labels.push(date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' }));
+                expectedData.push(Math.round(expectedMonthly));
+                actualData.push(Math.round(actualMonthly));
+            }
+            console.log("📅 Timeline chart:", months, "months");
+        }
+    }
+    
+    // Simple comparison if no timeline
+    if (labels.length === 0) {
+        console.log("📊 Simple comparison chart");
+        labels = ["Expected", "Actual"];
+        expectedData = [expectedProfit, 0];
+        actualData = [0, actualProfit];
+    }
+    
+    console.log("✅ Creating chart with labels:", labels.slice(0, 3), "...");
+    
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [
+                {
+                    label: 'Expected Profit (₹)',
+                    data: expectedData,
+                    backgroundColor: 'rgba(37, 99, 235, 0.8)',
+                    borderColor: '#2563eb',
+                    borderWidth: 2,
+                    borderRadius: 8
+                },
+                {
+                    label: 'Actual Profit (₹)',
+                    data: actualData,
+                    backgroundColor: 'rgba(22, 163, 74, 0.8)',
+                    borderColor: '#16a34a',
+                    borderWidth: 2,
+                    borderRadius: 8
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        callback: value => '₹' + value.toLocaleString('en-IN')
+                    }
+                }
+            },
+            plugins: {
+                legend: { display: true, position: 'top' }
+            }
+        }
+    });
+    
+    console.log("🎉 CHART LOADED SUCCESSFULLY!");
+});
+</script>
+
+{% endblock %}

@@ -1,0 +1,148 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<style>
+    .auth-wrapper {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 90vh;
+        background: #f4f6f9;
+    }
+
+    .auth-box {
+        width: 420px;
+        background: #ffffff;
+        padding: 35px;
+        border-radius: 10px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+    }
+
+    .auth-box h2 {
+        text-align: center;
+        margin-bottom: 10px;
+        font-size: 26px;
+        color: #111827;
+    }
+
+    .auth-box p {
+        text-align: center;
+        font-size: 14px;
+        color: #6b7280;
+        margin-bottom: 10px;
+    }
+
+    /* ADMIN NOTE */
+    .admin-note {
+        text-align: center;
+        font-size: 13px;
+        color: #92400e;
+        background: #fffbeb;
+        border: 1px solid #fde68a;
+        padding: 10px;
+        border-radius: 6px;
+        margin-bottom: 20px;
+        font-weight: 500;
+    }
+
+    .form-group {
+        margin-bottom: 18px;
+    }
+
+    .form-group label {
+        display: block;
+        margin-bottom: 6px;
+        font-weight: 500;
+        color: #374151;
+    }
+
+    .form-group input {
+        width: 100%;
+        padding: 10px;
+        border-radius: 6px;
+        border: 1px solid #d1d5db;
+        font-size: 15px;
+    }
+
+    .form-group input:focus {
+        outline: none;
+        border-color: #2563eb;
+    }
+
+    .submit-btn {
+        width: 100%;
+        padding: 12px;
+        background: #2563eb;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        font-size: 16px;
+        cursor: pointer;
+    }
+
+    .submit-btn:hover {
+        background: #1d4ed8;
+    }
+
+    .footer-text {
+        text-align: center;
+        margin-top: 15px;
+        font-size: 14px;
+    }
+
+    .footer-text a {
+        color: #2563eb;
+        text-decoration: none;
+    }
+</style>
+
+<div class="auth-wrapper">
+    <div class="auth-box">
+        <h2>Create Account</h2>
+        <p>Register to access your dashboard</p>
+
+        <!-- ADMIN NOTICE -->
+        <div class="admin-note">
+            ⚠️ Note: Accounts created here are registered as <strong>Admin accounts</strong> only.
+        </div>
+
+        <form method="post">
+            {% csrf_token %}
+
+            <div class="form-group">
+                <label>Username</label>
+                <input type="text" name="username" placeholder="Enter username" required>
+            </div>
+
+            <div class="form-group">
+                <label>Email</label>
+                <input type="email" name="email" placeholder="Enter email address" required>
+            </div>
+
+            <div class="form-group">
+                <label>Password</label>
+                <input type="password" name="password" placeholder="Create password" required>
+            </div>
+
+            <div class="form-group">
+                <label>Mobile Number</label>
+                <input 
+                    type="text" 
+                    name="mobile" 
+                    placeholder="10-digit mobile number" 
+                    pattern="[0-9]{10}" 
+                    required
+                >
+            </div>
+
+            <button type="submit" class="submit-btn">Create Account</button>
+        </form>
+
+        <div class="footer-text">
+            Already have an account?
+            <a href="{% url 'accounts:login' %}">Login here</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

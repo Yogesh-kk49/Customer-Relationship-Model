@@ -1,0 +1,599 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+
+<style>
+/* ===== ALL YOUR EXISTING STYLES + REPLY FUNCTIONALITY ===== */
+* {
+    box-sizing: border-box;
+    font-family: 'Segoe UI', system-ui, sans-serif;
+}
+
+body {
+    margin: 0;
+    background: #f3f4f6;
+}
+
+/* ===== HEADER ===== */
+header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 64px;
+    background: linear-gradient(180deg, #111827, #020617);
+    padding: 0 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    z-index: 1000;
+}
+
+.header-left {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.menu-btn {
+    font-size: 24px;
+    color: white;
+    cursor: pointer;
+    user-select: none;
+}
+
+.logo {
+    color: #fff;
+    font-size: 22px;
+    font-weight: 600;
+}
+
+.header-right {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    position: relative;
+}
+
+.nav-btn {
+    background: #2563eb;
+    color: white;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-size: 14px;
+    text-decoration: none;
+}
+.nav-btn:hover { background: #1e40af; }
+
+.profile-photo {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    border: 2px solid #3b82f6;
+    object-fit: cover;
+}
+
+/* 🔔 NOTIFICATION BELL */
+.bell {
+    position: relative;
+    font-size: 22px;
+    color: white;
+    cursor: pointer;
+}
+
+.bell-dot {
+    position: absolute;
+    top: -2px;
+    right: -2px;
+    width: 10px;
+    height: 10px;
+    background: #ef4444;
+    border-radius: 50%;
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.3); }
+    100% { transform: scale(1); }
+}
+
+.bell-dot.hidden {
+    opacity: 0;
+}
+
+/* 🔔 NOTIFICATION DROPDOWN */
+.notification-box {
+    position: absolute;
+    top: 64px;
+    right: 0;
+    width: 380px;
+    max-height: 500px;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+    display: none;
+    overflow: hidden;
+    z-index: 2000;
+    border: 1px solid #e5e7eb;
+}
+
+.notification-box.active {
+    display: block;
+}
+
+/* REPLY FORM */
+.reply-form {
+    background: #f8fafc;
+    padding: 16px;
+    border-top: 1px solid #e5e7eb;
+    display: none;
+}
+
+.reply-form.active {
+    display: block;
+}
+
+.reply-textarea {
+    width: 100%;
+    min-height: 70px;
+    padding: 12px;
+    border: 2px solid #e5e7eb;
+    border-radius: 8px;
+    font-size: 14px;
+    font-family: inherit;
+    resize: vertical;
+    margin-bottom: 12px;
+}
+
+.reply-textarea:focus {
+    outline: none;
+    border-color: #2563eb;
+}
+
+.reply-buttons {
+    display: flex;
+    gap: 8px;
+    justify-content: flex-end;
+}
+
+.reply-btn {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.btn-reply-send {
+    background: #2563eb;
+    color: white;
+}
+.btn-reply-send:hover { background: #1e40af; }
+
+.btn-reply-cancel {
+    background: #f3f4f6;
+    color: #6b7280;
+}
+.btn-reply-cancel:hover { background: #e5e7eb; }
+
+.notification-header {
+    padding: 16px 20px;
+    background: #f8fafc;
+    border-bottom: 1px solid #e5e7eb;
+    font-weight: 600;
+    font-size: 15px;
+    color: #1f2937;
+}
+
+.notification-item {
+    padding: 16px 20px;
+    border-bottom: 1px solid #f3f4f6;
+    cursor: pointer;
+    transition: background 0.2s;
+    position: relative;
+}
+
+.notification-item:hover {
+    background: #f8fafc;
+}
+
+.notification-item.read {
+    opacity: 0.6;
+    background: #f9fafb;
+}
+
+.notification-username {
+    font-size: 13px;
+    font-weight: 600;
+    color: #2563eb;
+}
+
+.notification-message {
+    font-size: 14px;
+    color: #1f2937;
+    line-height: 1.4;
+    margin-bottom: 4px;
+}
+
+.notification-time {
+    font-size: 12px;
+    color: #6b7280;
+}
+
+.reply-toggle {
+    background: none;
+    border: 1px solid #2563eb;
+    color: #2563eb;
+    padding: 4px 12px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    margin-top: 8px;
+}
+.reply-toggle:hover {
+    background: #eff6ff;
+}
+
+/* ===== REST OF YOUR STYLES ===== */
+.sidebar {
+    position: fixed;
+    top: 64px;
+    left: -240px;
+    width: 240px;
+    height: calc(100vh - 64px);
+    background: #020617;
+    padding: 20px;
+    color: #e5e7eb;
+    transition: left 0.3s ease;
+    z-index: 999;
+}
+
+.sidebar.active { left: 0; }
+
+.sidebar h3 {
+    font-size: 13px;
+    color: #9ca3af;
+    margin-bottom: 14px;
+    text-transform: uppercase;
+}
+
+.sidebar a {
+    display: block;
+    padding: 10px 12px;
+    border-radius: 6px;
+    color: #e5e7eb;
+    text-decoration: none;
+    font-size: 14px;
+    margin-bottom: 8px;
+    cursor: pointer;
+}
+.sidebar a:hover { background: #1f2937; }
+
+.container {
+    max-width: 1100px;
+    margin: 96px auto 60px;
+    padding: 0 16px;
+
+}
+
+.back-btn, .btn, .btn-danger {
+    display: inline-block;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-size: 14px;
+    text-decoration: none;
+    color: white;
+    background: #2563eb;
+    border: none;
+    font-weight: 600;
+    cursor: pointer;
+    margin: 5px;
+}
+.back-btn:hover, .btn:hover { background: #1e40af; }
+.btn-danger { background: #dc2626; }
+.btn-danger:hover { background: #b91c1c; }
+
+.card {
+    background: #fff;
+    padding: 32px;
+    border-radius: 14px;
+    box-shadow: 0 12px 30px rgba(0,0,0,0.08);
+    margin-top: 24px;
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 20px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+th, td { padding: 14px; border-bottom: 1px solid #e5e7eb; }
+th { background: #f9fafb; font-weight: 700; }
+.action-group { display: flex; justify-content: center; gap: 10px; }
+
+.msg {
+    padding: 14px;
+    border-radius: 8px;
+    margin-bottom: 18px;
+    font-weight: 500;
+}
+.msg-success { background: #dcfce7; color: #166534; }
+.msg-error { background: #fee2e2; color: #991b1b; }
+.profile-avatar {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    border: 2px solid #2563eb;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    font-size: 12px;
+    font-weight: 700;
+    color: white;
+    background: linear-gradient(135deg, #2563eb, #1e40af);
+    overflow: hidden;
+}
+
+.profile-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+</style>
+
+<!-- ===== HEADER WITH REPLY NOTIFICATIONS ===== -->
+<header>
+    <div class="header-left">
+        <div class="menu-btn" onclick="toggleSidebar()">☰</div>
+        <div class="logo">MyCRM</div>
+    </div>
+
+    <div class="header-right">
+        <!-- 🔔 NOTIFICATION BELL -->
+        <div class="bell" onclick="toggleNotifications()" id="bellIcon">
+            🔔
+            {% if unread_count > 0 %}
+                <span class="bell-dot" id="bellDot"></span>
+            {% endif %}
+        </div>
+
+        <!-- 🔔 NOTIFICATION DROPDOWN WITH REPLY -->
+        <div class="notification-box" id="notificationBox">
+            <div class="notification-header">
+                Notifications ({{ unread_count|default:0 }})
+            </div>
+            
+            {% if notifications %}
+                {% for note in notifications %}
+                    <div class="notification-item {% if note.is_read %}read{% endif %}" 
+                         id="notification-{{ note.id }}" data-notification-id="{{ note.id }}">
+                        
+                        <div class="notification-username">
+                            {{ note.sender.username }} 
+                            {% if note.sender.role == 'customer' %}(Customer){% endif %}
+                        </div>
+                        
+                        <div class="notification-message">{{ note.message }}</div>
+                        
+                        <div class="notification-time">
+                            {{ note.created_at|date:"d M Y, h:i A" }}
+                        </div>
+                        
+                        <!-- REPLY BUTTON (only for unread or customer messages) -->
+                        <button class="reply-toggle" onclick="toggleReply({{ note.id }})">
+                            💬 Reply
+                        </button>
+                        
+                        <!-- REPLY FORM -->
+                        <div class="reply-form" id="reply-form-{{ note.id }}">
+                            <textarea class="reply-textarea" 
+                                      placeholder="Type your reply here..." 
+                                      id="reply-text-{{ note.id }}"></textarea>
+                            <div class="reply-buttons">
+                                <button class="reply-btn btn-reply-cancel" onclick="cancelReply({{ note.id }})">
+                                    Cancel
+                                </button>
+                                <button class="reply-btn btn-reply-send" onclick="sendReply({{ note.id }})">
+                                    Send Reply
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <div class="notification-item">No new notifications</div>
+            {% endif %}
+        </div>
+
+        <a href="{% url 'accounts:leads' %}" class="nav-btn">Leads</a>
+        <a href="{% url 'accounts:admin_profile' %}" class="profile-avatar">
+    {% if request.user.profile_photo %}
+        <img src="{{ request.user.profile_photo.url }}" alt="Profile">
+    {% else %}
+        {{ request.user.username|slice:":2"|upper }}
+    {% endif %}
+</a>
+    </div>
+</header>
+
+<!-- ===== SIDEBAR ===== -->
+<div class="sidebar" id="sidebar">
+    <h3>Support</h3>
+    <a href="{% url 'accounts:admin_history' %}">📜 History</a>
+    <a href="{% url 'accounts:admin_help' %}">❓ Help</a>
+    <a href="{% url 'accounts:admin_terms' %}">📄 Terms & Conditions</a>
+</div>
+
+<!-- ===== MAIN CONTENT ===== -->
+<div class="container">
+    <h2>Admin Dashboard</h2>
+
+    {% for message in messages %}
+        <div class="msg {% if message.tags == 'success' %}msg-success{% else %}msg-error{% endif %}">
+            {{ message }}
+        </div>
+    {% endfor %}
+
+    <button class="btn" onclick="toggleForm()">+ Create New Customer</button>
+
+    <div id="createForm" class="card" style="display:none;">
+        <h3>Create New Customer</h3>
+        <form method="post">
+            {% csrf_token %}
+            <div class="form-grid">
+                <input type="text" name="username" placeholder="Username" required>
+                <input type="tel" name="mobile" placeholder="Mobile" required>
+                <input type="email" name="email" placeholder="Email" required>
+                <input type="password" name="password" placeholder="Password" required>
+            </div>
+            <button type="submit" class="btn" style="margin-top:20px;">Create</button>
+        </form>
+    </div>
+
+    <div class="card">
+        <h3>Registered Customers ({{ profiles|length }})</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Username</th>
+                    <th>Email</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for profile in profiles %}
+                <tr>
+                    <td>{{ profile.user.username }}</td>
+                    <td>{{ profile.user.email }}</td>
+                    <td>
+                        <div class="action-group">
+                            <a href="{% url 'accounts:view_customer' profile.user.id %}" class="btn">View</a>
+                            <form method="post" action="{% url 'accounts:delete_customer' profile.user.id %}" 
+                                  onsubmit="return confirm('Are you sure?');" style="display:inline;">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-danger">Delete</button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- CSRF Token -->
+{% csrf_token %}
+
+<script>
+function toggleSidebar() {
+    document.getElementById("sidebar").classList.toggle("active");
+}
+
+function toggleForm() {
+    const form = document.getElementById("createForm");
+    form.style.display = form.style.display === "none" ? "block" : "none";
+}
+
+function toggleNotifications() {
+    const box = document.getElementById("notificationBox");
+    box.classList.toggle("active");
+
+    const bellDot = document.getElementById("bellDot");
+    if (bellDot) {
+        bellDot.classList.add("hidden");
+        setTimeout(() => bellDot.style.display = "none", 300);
+    }
+
+    // ✅ THIS IS THE MISSING PIECE
+    fetch("{% url 'accounts:mark_all_notifications_read' %}", {
+        method: "POST",
+        headers: {
+            "X-CSRFToken": document.querySelector(
+                "[name=csrfmiddlewaretoken]"
+            ).value
+        }
+    });
+}
+
+function toggleReply(notificationId) {
+    const form = document.getElementById(`reply-form-${notificationId}`);
+    const notificationItem = document.getElementById(`notification-${notificationId}`);
+    form.classList.toggle("active");
+    notificationItem.classList.add("read");
+}
+
+function cancelReply(notificationId) {
+    const form = document.getElementById(`reply-form-${notificationId}`);
+    const textarea = document.getElementById(`reply-text-${notificationId}`);
+    form.classList.remove("active");
+    textarea.value = "";
+}
+
+async function sendReply(notificationId) {
+    const textarea = document.getElementById(`reply-text-${notificationId}`);
+    const message = textarea.value.trim();
+    
+    if (!message) {
+        alert("Please enter a reply message");
+        return;
+    }
+    
+    const csrfToken = document.querySelector("[name=csrfmiddlewaretoken]").getAttribute("value");
+    
+    try {
+        const response = await fetch("{% url 'accounts:send_reply' %}", {
+            method: "POST",
+            headers: {
+                "X-CSRFToken": csrfToken,
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                notification_id: notificationId,
+                message: message
+            })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            // Success: hide form, mark as read, show success
+            cancelReply(notificationId);
+            const notificationItem = document.getElementById(`notification-${notificationId}`);
+            notificationItem.classList.add("read");
+            
+            // Replace reply button with success message
+            const replyBtn = notificationItem.querySelector(".reply-toggle");
+            replyBtn.outerHTML = '<span style="color: #10b981; font-size: 12px; font-weight: 500;">✅ Reply sent!</span>';
+            
+            alert("Reply sent successfully to customer!");
+        } else {
+            alert("Failed to send reply: " + (data.error || "Unknown error"));
+        }
+    } catch (error) {
+        console.error("Error:", error);
+        alert("Error sending reply. Please try again.");
+    }
+}
+
+// Close notifications when clicking outside
+document.addEventListener("click", function(e) {
+    const bell = document.querySelector(".bell");
+    const box = document.getElementById("notificationBox");
+    if (!bell?.contains(e.target) && !box?.contains(e.target)) {
+        box.classList.remove("active");
+    }
+});
+</script>
+
+{% endblock %}

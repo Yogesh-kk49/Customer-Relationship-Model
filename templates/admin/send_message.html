@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+{% block content %}
+
+<style>
+.container {
+    max-width: 600px;
+    margin: 40px auto;
+}
+
+.card {
+    background: #fff;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 10px 28px rgba(0,0,0,0.08);
+}
+
+textarea {
+    width: 100%;
+    min-height: 120px;
+    padding: 12px;
+    border-radius: 8px;
+    border: 1px solid #d1d5db;
+}
+
+button {
+    background: #2563eb;
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 6px;
+    cursor: pointer;
+    margin-top: 12px;
+}
+
+/* ✅ SUCCESS MESSAGE STYLES */
+.success-message {
+    background: linear-gradient(135deg, #10b981, #059669);
+    color: white;
+    padding: 20px;
+    border-radius: 12px;
+    margin-bottom: 24px;
+    text-align: center;
+    font-weight: 600;
+    box-shadow: 0 10px 30px rgba(16,185,129,0.3);
+    animation: slideDown 0.5s ease-out;
+    border: 2px solid rgba(255,255,255,0.3);
+    position: relative;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.success-message::before {
+    content: '✅';
+    margin-right: 10px;
+    font-size: 20px;
+}
+</style>
+
+<div class="container">
+    <div class="card">
+        <!-- ✅ CRITICAL: SUCCESS MESSAGE DISPLAY - WILL WORK -->
+        {% if messages %}
+            {% for message in messages %}
+                <div class="success-message">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        <h2>Send Message to {{ customer.username }}</h2>
+
+        <form method="post">
+            {% csrf_token %}
+            <textarea name="message" placeholder="Type your message here..." required></textarea>
+            <button type="submit">Send Message</button>
+        </form>
+    </div>
+</div>
+
+{% endblock %}

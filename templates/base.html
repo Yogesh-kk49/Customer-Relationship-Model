@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}MyCRM{% endblock %}</title>
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: #f4f6f9;
+            line-height: 1.6;
+        }
+
+        /* ✅ HEADER - PERFECT DARK BG */
+        header {
+            background: #111827 !important;
+            color: white !important;
+            padding: 15px 25px;
+            display: flex;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .logo {
+            font-size: 22px;
+            font-weight: 600;
+            color: white !important;
+        }
+
+        .header-right {
+            margin-left: auto;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .back-btn {
+            padding: 8px 14px;
+            background: #ef4444;
+            color: white !important;
+            text-decoration: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+
+        .back-btn:hover {
+            background: #dc2626;
+        }
+
+        /* ✅ BULLETPROOF NOTIFICATION BELL */
+        .notification-bell {
+            position: relative !important;
+            display: inline-flex !important;
+            align-items: center;
+            justify-content: center;
+            width: 44px !important;
+            height: 44px !important;
+            background: rgba(255,255,255,0.15) !important;
+            border-radius: 50% !important;
+            color: #ffffff !important;
+            font-size: 20px !important;
+            text-decoration: none !important;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .notification-bell:hover {
+            background: rgba(255,255,255,0.25) !important;
+            transform: scale(1.1);
+        }
+
+        /* ✅ SERVER-CONTROLLED RED DOT - UNBREAKABLE */
+        .notification-dot {
+            position: absolute !important;
+            top: -4px !important;
+            right: -4px !important;
+            width: 12px !important;
+            height: 12px !important;
+            background: #ef4444 !important;
+            border: 3px solid #111827 !important;
+            border-radius: 50% !important;
+            animation: pulse 2s infinite !important;
+            z-index: 9999 !important;
+            display: block !important;
+            opacity: 1 !important;
+        }
+
+        /* ✅ FORCE DOT VISIBLE ON ALL STATES */
+        .notification-bell:hover .notification-dot,
+        .notification-bell:focus .notification-dot,
+        .notification-bell:active .notification-dot,
+        .notification-bell:visited .notification-dot {
+            display: block !important;
+            opacity: 1 !important;
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.8); }
+            70% { box-shadow: 0 0 0 8px rgba(239, 68, 68, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+        }
+
+        /* ✅ PERFECT DARK TEXT NOTIFICATIONS */
+        .notification-dropdown {
+            position: absolute !important;
+            top: 100% !important;
+            right: 0 !important;
+            background: #ffffff !important;
+            min-width: 350px !important;
+            max-height: 500px;
+            overflow-y: auto;
+            border-radius: 12px !important;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15) !important;
+            border: 1px solid #e5e7eb !important;
+            z-index: 1001 !important;
+            margin-top: 8px;
+            color: #1f2937 !important;
+            display: none !important;
+        }
+
+        .notification-header {
+            padding: 16px 20px !important;
+            background: #f8fafc !important;
+            border-bottom: 1px solid #e5e7eb !important;
+            font-weight: 600 !important;
+            color: #1f2937 !important;
+            font-size: 14px !important;
+        }
+
+        .notification-item {
+            padding: 16px 20px !important;
+            border-bottom: 1px solid #f3f4f6 !important;
+            color: #374151 !important;
+            font-weight: 500 !important;
+            text-decoration: none !important;
+            display: block !important;
+            transition: background 0.2s ease;
+        }
+
+        .notification-item:hover {
+            background: #f8fafc !important;
+        }
+
+        .notification-item.unread {
+            background: #eff6ff !important;
+            color: #1f2937 !important;
+            font-weight: 600 !important;
+            border-left: 4px solid #2563eb !important;
+        }
+
+        .notification-footer {
+            padding: 12px 20px !important;
+            border-top: 1px solid #e5e7eb !important;
+            text-align: center !important;
+        }
+
+        .mark-read-btn {
+            display: inline-block !important;
+            padding: 8px 16px !important;
+            background: #2563eb !important;
+            color: white !important;
+            text-decoration: none !important;
+            border-radius: 6px !important;
+            font-size: 13px !important;
+            font-weight: 500 !important;
+            transition: all 0.2s ease;
+        }
+
+        .mark-read-btn:hover {
+            background: #1d4ed8 !important;
+            color: white !important;
+        }
+
+        /* ✅ FIXED CENTERED CONTAINER */
+        .container {
+            max-width: 1200px !important;
+            margin: 0 auto !important;
+            padding: 30px 20px !important;
+            width: 100% !important;
+            min-height: calc(100vh - 80px);
+            display: block !important;
+            position: relative !important;
+            left: 0 !important;
+            right: 0 !important;
+            box-sizing: border-box !important;
+        }
+
+        /* OVERRIDE FOR CHILD PAGES */
+        .container > .container {
+            max-width: 1100px !important;
+            margin: 96px auto 60px !important;
+            padding: 0 16px !important;
+        }
+
+        /* RESPONSIVE */
+        @media (max-width: 768px) {
+            .container { 
+                padding: 20px 16px !important; 
+                margin: 80px 16px 40px 16px !important;
+            }
+            .container > .container {
+                margin: 96px 16px 40px !important;
+                padding: 0 !important;
+            }
+            header { padding: 12px 20px; }
+        }
+
+        /* FORCE CENTERING FOR ALL NESTED CONTAINERS */
+        body .container,
+        body .container * {
+            max-width: 100% !important;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- GLOBAL CSRF TOKEN -->
+    <form style="display: none;">
+        {% csrf_token %}
+    </form>
+
+    <!-- HEADER -->
+    <header>
+        <div class="logo">MyCRM</div>
+        
+        <div class="header-right">
+            {% if request.resolver_match.url_name == 'login' or request.resolver_match.url_name == 'register' %}
+                <a href="{% url 'accounts:home' %}" class="back-btn">← Back</a>
+            {% endif %}
+
+            {% block header_right %}
+                <!-- ✅ BULLETPROOF NOTIFICATION SYSTEM -->
+                {% if show_notifications and request.user.is_authenticated and request.user.is_staff %}
+                    <div class="notification-container" style="position: relative;">
+                        
+                        <!-- BELL LINK - GOES TO NOTIFICATIONS PAGE -->
+                        <a href="{% url 'accounts:admin_dashboard' %}" class="notification-bell">
+                            🔔
+                            <!-- ✅ SERVER CONTROLLED - IMPOSSIBLE TO BREAK -->
+                            {% if unread_count > 0 %}
+                                <span class="notification-dot"></span>
+                            {% endif %}
+                        </a>
+                        
+                        <!-- DROPDOWN - HIDDEN BY CSS -->
+                        <div class="notification-dropdown">
+                            <div class="notification-header">
+                                Notifications 
+                                <span style="color: #ef4444; font-weight: 700;">({{ unread_count|default:0 }})</span>
+                            </div>
+                            
+                            {% if notifications %}
+                                {% for notification in notifications %}
+                                    <a href="{% url 'accounts:admin_dashboard' %}" 
+                                       class="notification-item {% if not notification.is_read %}unread{% endif %}">
+                                        {{ notification.message|truncatechars:80 }}
+                                        <br><small style="color: #6b7280;">{{ notification.created_at|date:"M d, Y h:i A" }}</small>
+                                    </a>
+                                {% endfor %}
+                            {% else %}
+                                <div class="notification-item" style="text-align: center; color: #6b7280; cursor: default;">
+                                    No notifications
+                                </div>
+                            {% endif %}
+                            
+                            {% if unread_count > 0 %}
+                                <div class="notification-footer">
+                                    <a href="{% url 'accounts:mark_all_notifications_read' %}" class="mark-read-btn">
+                                        Mark All Read
+                                    </a>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                {% endif %}
+            {% endblock %}
+        </div>
+    </header>
+
+    <!-- MAIN CONTENT -->
+    <div class="container">
+        {% block content %}
+        {% endblock %}
+    </div>
+
+    <!-- ✅ ZERO JS - PURE SERVER LOGIC -->
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log('✅ Base template loaded - Pure server-controlled notifications');
+    });
+    </script>
+</body>
+</html>

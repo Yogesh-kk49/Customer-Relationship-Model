@@ -1,0 +1,220 @@
+{% extends "base.html" %}
+{% block content %}
+
+<style>
+    .container {
+        max-width: 1100px;
+        margin: 60px auto;
+    }
+
+    .card {
+        background: white;
+        padding: 30px;
+        border-radius: 12px;
+        box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+        margin-bottom: 25px;
+    }
+
+    h2 {
+        margin-bottom: 20px;
+        color: #1f2937;
+    }
+
+    input {
+        padding: 10px;
+        width: 100%;
+        margin-bottom: 12px;
+        border-radius: 6px;
+        border: 1px solid #d1d5db;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    th, td {
+        padding: 12px;
+        border-bottom: 1px solid #e5e7eb;
+        text-align: left;
+    }
+
+    th {
+        background: #f9fafb;
+    }
+
+    .btn {
+        padding: 6px 14px;
+        border-radius: 6px;
+        text-decoration: none;
+        font-size: 14px;
+        border: none;
+        cursor: pointer;
+        color: white;
+        background: #2563eb;
+    }
+
+    .btn:hover {
+        background: #1e40af;
+    }
+
+    .btn-delete {
+        background: #dc2626;
+    }
+
+    .btn-delete:hover {
+        background: #b91c1c;
+    }
+
+    .btn-convert {
+        background: #16a34a;
+    }
+
+    .btn-convert:hover {
+        background: #15803d;
+    }
+
+    /* 🔴 RED BACK BUTTON */
+    .back-btn {
+        display: inline-block;
+        margin-bottom: 18px;
+        padding: 6px 14px;
+        border-radius: 6px;
+        background: #dc2626;
+        color: white;
+        text-decoration: none;
+        font-weight: 600;
+    }
+
+    .back-btn:hover {
+        background: #b91c1c;
+    }
+
+    .msg {
+        padding: 12px;
+        border-radius: 6px;
+        margin-bottom: 15px;
+        font-weight: 500;
+    }
+
+    .msg-success {
+        background: #dcfce7;
+        color: #166534;
+        border: 1px solid #86efac;
+    }
+
+    .msg-error {
+        background: #fee2e2;
+        color: #991b1b;
+        border: 1px solid #fecaca;
+    }
+
+    .add-btn {
+        margin-bottom: 15px;
+        background: #2563eb;
+    }
+
+    .count {
+        margin-bottom: 12px;
+        color: #374151;
+        font-size: 14px;
+        font-weight: 500;
+    }
+
+    /* ✅ ACTION BUTTON SPACING */
+    .action-buttons {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+    }
+</style>
+
+<div class="container">
+
+    <!-- 🔴 BACK TO DASHBOARD -->
+    <a href="{% url 'accounts:admin_dashboard' %}" class="back-btn">
+        ← Back to Dashboard
+    </a>
+
+    <h2>Leads</h2>
+
+    <!-- MESSAGES -->
+    {% if messages %}
+        {% for message in messages %}
+            <div class="msg {% if message.tags == 'success' %}msg-success{% else %}msg-error{% endif %}">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <!-- ADD LEAD -->
+    <button class="btn add-btn" onclick="toggleLeadForm()">+ Add Lead</button>
+
+    <div class="card" id="leadForm" style="display:none;">
+        <h2>Add Lead</h2>
+        <form method="post">
+            {% csrf_token %}
+            <input type="text" name="username" placeholder="Username" required>
+            <input type="email" name="email" placeholder="Email" required>
+            <button class="btn">Save Lead</button>
+        </form>
+    </div>
+
+    <!-- LEADS LIST -->
+    <div class="card">
+        <h2>Leads List</h2>
+
+        <div class="count">
+            Total Leads: {{ leads|length }}
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Username</th>
+                    <th>Email</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for lead in leads %}
+                <tr>
+                    <td>{{ lead.username }}</td>
+                    <td>{{ lead.email }}</td>
+                    <td>
+                        <div class="action-buttons">
+                            <a href="{% url 'accounts:convert_lead' lead.id %}"
+                               class="btn btn-convert">
+                                Convert
+                            </a>
+
+                            <form method="post"
+                                  action="{% url 'accounts:delete_lead' lead.id %}"
+                                  onsubmit="return confirm('Are you sure you want to delete this lead?');">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-delete">
+                                    Delete
+                                </button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="3">No leads found.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+</div>
+
+<script>
+function toggleLeadForm() {
+    const form = document.getElementById("leadForm");
+    form.style.display = form.style.display === "none" ? "block" : "none";
+}
+</script>
+
+{% endblock %}
