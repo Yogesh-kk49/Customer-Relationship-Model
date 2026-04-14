@@ -47,11 +47,10 @@ urlpatterns = [
     views.admin_send_message,
     name="admin_send_message"
 ),
-    path('accounts/send-reply/', views.send_reply, name='send_reply'),
-    path('accounts/mark-all-notifications-read/', views.mark_all_notifications_read, name='mark_all_notifications_read'),
+    path('send-reply/', views.send_reply, name='send_reply'),
+    path('mark-all-notifications-read/', views.mark_all_notifications_read, name='mark_all_notifications_read'),
     path("customer/help/", views.customer_help, name="customer_help"),
     path("customer/terms/", views.customer_terms, name="customer_terms"),
     path("contact-admin/", views.contact_admin, name="contact_admin"),
-    path('contact-admin/', views.contact_admin, name='contact_admin'),
 
 ]

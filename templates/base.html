@@ -235,6 +235,7 @@
     </form>
 
     <!-- HEADER -->
+     {% block show_header %}
     <header>
         <div class="logo">MyCRM</div>
         
@@ -291,12 +292,15 @@
             {% endblock %}
         </div>
     </header>
+    {% endblock %}
 
     <!-- MAIN CONTENT -->
-    <div class="container">
-        {% block content %}
+    {% block page_wrapper %}
+        <div class="container">
+            {% block content %}
+            {% endblock %}
+        </div>
         {% endblock %}
-    </div>
 
     <!-- ✅ ZERO JS - PURE SERVER LOGIC -->
     <script>

@@ -16,7 +16,7 @@ from .forms import BusinessProfileForm
 from documents.models import Document
 from .models import ContactMessage, Notification
 from decimal import Decimal
-
+from django.utils import timezone
 from accounts.utils import log_activity
 from .models import BusinessProfile, Lead, ActivityLog
 
@@ -31,7 +31,7 @@ def home(request):
 # ---------------- LOGIN ----------------
 def login_view(request):
     if request.method == "POST":
-        username = request.POST.get("username")
+        email = request.POST.get("username")   # frontend field name unchanged
         password = request.POST.get("password")
         selected_role = request.POST.get("role")
 
@@ -40,11 +40,20 @@ def login_view(request):
                 "error": "Please select Admin or Customer"
             })
 
-        user = authenticate(request, username=username, password=password)
+        user_obj = User.objects.filter(email=email).first()
+
+        if user_obj:
+            user = authenticate(
+                request,
+                username=user_obj.username,
+                password=password
+            )
+        else:
+            user = None
 
         if not user:
             return render(request, "auth/login.html", {
-                "error": "Invalid username or password"
+                "error": "Invalid email or password"
             })
 
         if user.role != selected_role:
@@ -66,8 +75,6 @@ def login_view(request):
         )
 
     return render(request, "auth/login.html")
-
-
 # ---------------- LOGOUT ----------------
 def logout_view(request):
     if request.user.is_authenticated:
@@ -83,11 +90,16 @@ def register(request):
         username = request.POST.get("username")
         password = request.POST.get("password")
         email = request.POST.get("email")
-        mobile = request.POST.get("mobile")  # ✅ FIX
+        mobile = request.POST.get("mobile")
 
         if User.objects.filter(username=username).exists():
             return render(request, "auth/register.html", {
                 "error": "Username already exists"
+            })
+
+        if User.objects.filter(email=email).exists():
+            return render(request, "auth/register.html", {
+                "error": "Email already exists"
             })
 
         if not mobile or not mobile.isdigit() or len(mobile) != 10:
@@ -95,7 +107,6 @@ def register(request):
                 "error": "Enter a valid 10-digit mobile number"
             })
 
-        # ✅ Create admin user
         user = User.objects.create_user(
             username=username,
             password=password,
@@ -105,7 +116,6 @@ def register(request):
             is_superuser=False
         )
 
-        # ✅ CREATE BUSINESS PROFILE (THIS WAS MISSING)
         BusinessProfile.objects.create(
             user=user,
             mobile=mobile
@@ -128,12 +138,50 @@ def admin_dashboard(request):
         messages.error(request, "Access denied.")
         return redirect("accounts:login")
 
-    # 🔒 ONLY customers created by THIS admin
+    # ONLY customers created by this admin
     profiles = BusinessProfile.objects.filter(
         user__role="customer",
         created_by=request.user
     ).select_related("user")
 
+    # ==============================
+    # SERIALIZE NOTIFICATIONS FOR JSON
+    # ==============================
+    raw_notifications = Notification.objects.filter(
+        receiver=request.user
+    ).select_related("sender", "receiver").order_by("-created_at")
+    notifications = [
+        {
+            "id": n.id,
+            "sender": n.sender.username if n.sender else None,
+            "recipient": n.receiver.username if n.receiver else None,
+            "message": n.message,
+            "is_read": n.is_read,
+            "time": n.created_at.strftime("%b %d, %Y %I:%M %p"),
+
+            "message_type": getattr(n, "message_type", None),
+            "is_sent_reply": getattr(n, "is_sent_reply", False),
+            "is_received_reply": getattr(n, "is_received_reply", False),
+
+            "replied_to": getattr(n, "replied_to", None),
+            "last_reply_message": getattr(n, "last_reply_message", None),
+            "last_reply_sender": getattr(n, "last_reply_sender", None),
+            "last_reply_target": getattr(n, "last_reply_target", None),
+
+            "last_reply_time": (
+                n.last_reply_time.strftime("%b %d, %Y %I:%M %p")
+                if getattr(n, "last_reply_time", None)
+                else None
+            ),
+        }
+        for n in raw_notifications
+    ]
+
+    unread_count = raw_notifications.filter(is_read=False).count()
+
+    # ==============================
+    # CREATE CUSTOMER
+    # ==============================
     if request.method == "POST":
         username = request.POST.get("username")
         email = request.POST.get("email")
@@ -155,6 +203,11 @@ def admin_dashboard(request):
             role="customer"
         )
 
+        Customer.objects.create(
+            user=user,
+            mobile=mobile
+        )
+
         BusinessProfile.objects.create(
             user=user,
             created_by=request.user,
@@ -170,15 +223,6 @@ def admin_dashboard(request):
         messages.success(request, "Customer created successfully.")
         return redirect("accounts:admin_dashboard")
 
-    notifications = Notification.objects.filter(
-        receiver=request.user
-    ).select_related("sender").order_by("-created_at")[:10]
-
-    unread_count = Notification.objects.filter(
-        receiver=request.user,
-        is_read=False
-    ).count()
-
     return render(
         request,
         "admin/dashboard.html",
@@ -188,28 +232,6 @@ def admin_dashboard(request):
             "unread_count": unread_count,
         }
     )
-
-    # ---------------- NOTIFICATIONS ----------------
-    notifications = Notification.objects.filter(
-        receiver=request.user
-    ).select_related("sender").order_by("-created_at")[:10]
-
-    unread_count = Notification.objects.filter(
-        receiver=request.user,
-        is_read=False
-    ).count()
-
-    return render(
-        request,
-        "admin/dashboard.html",
-        {
-            "profiles": profiles,
-            "notifications": notifications,
-            "unread_count": unread_count,
-        }
-    )
-
-
 # ---------------- ADMIN VIEW CUSTOMER ----------------
 @login_required  # ✅ FIXED: Only ONE decorator
 def view_customer(request, user_id):
@@ -381,11 +403,15 @@ def convert_lead(request, lead_id):
             role="customer"
         )
 
+        Customer.objects.create(
+            user=user,
+            mobile=request.POST.get("mobile", "")
+        )
+
         BusinessProfile.objects.create(
             user=user,
             created_by=request.user
         )
-
         log_activity(
             actor=request.user,
             customer=user,
@@ -592,74 +618,141 @@ def admin_send_message(request, user_id):
         messages.error(request, "Access denied.")
         return redirect("accounts:login")
 
-    customer = get_object_or_404(User, id=user_id, role="customer")
+    customer = get_object_or_404(
+        User,
+        id=user_id,
+        role="customer"
+    )
 
     if request.method == "POST":
-        message_text = request.POST.get("message")
-        if message_text:
-            Notification.objects.create(
-                sender=request.user,
-                receiver=customer,
-                message=message_text
-            )
-            log_activity(actor=request.user, customer=customer, action="Sent message to customer")
-            
-            # ✅ Success message for view_customer page
-            messages.success(request, f"✅ Message sent to {customer.username} successfully!")
-            
-            # ✅ Redirect to view_customer
-            return redirect('accounts:view_customer', user_id=customer.id)
+        message_text = request.POST.get("message", "").strip()
 
-    return render(request, "admin/send_message.html", {"customer": customer})
+        if not message_text:
+            messages.error(request, "Message cannot be empty.")
+            return redirect("accounts:admin_send_message", user_id=customer.id)
 
+        # =====================================
+        # SEND TO CUSTOMER
+        # =====================================
+        Notification.objects.create(
+            sender=request.user,
+            receiver=customer,
+            message=message_text
+        )
+
+        # =====================================
+        # SAVE COPY FOR ADMIN HISTORY/NOTIFICATIONS
+        # =====================================
+        Notification.objects.create(
+            sender=request.user,
+            receiver=request.user,
+            message=f"You sent to {customer.username}: {message_text}"
+        )
+
+        # =====================================
+        # ACTIVITY LOG
+        # =====================================
+        log_activity(
+            actor=request.user,
+            customer=customer,
+            action="Sent message to customer"
+        )
+
+        # =====================================
+        # SUCCESS MESSAGE
+        # =====================================
+        messages.success(
+            request,
+            f"✅ Message sent to {customer.username} successfully!"
+        )
+
+        return redirect(
+            "accounts:view_customer",
+            user_id=customer.id
+        )
+
+    return render(
+        request,
+        "admin/send_message.html",
+        {
+            "customer": customer
+        }
+    )
 @login_required
 @require_POST
-@csrf_exempt
 def send_reply(request):
-    """Customer replies to admin → Creates NEW notification for admin"""
     try:
         data = json.loads(request.body)
-        notification_id = data.get('notification_id')
-        message = data.get('message').strip()
+        notification_id = data.get("notification_id")
+        message = data.get("message", "").strip()
 
-        if not all([notification_id, message]):
-            return JsonResponse({'success': False, 'error': 'Missing data'}, status=400)
+        if not notification_id or not message:
+            return JsonResponse(
+                {"success": False, "error": "Missing data"},
+                status=400
+            )
 
-        notification = Notification.objects.get(
+        original_notification = Notification.objects.get(
             id=notification_id,
             receiver=request.user
         )
 
-        admin_user = notification.sender
+        admin_user = original_notification.sender
 
-        # ✅ FIXED: "replied to your [ORIGINAL_MSG]: [REPLY]" format
-        original_message_preview = notification.message[:50] + "..." if len(notification.message) > 50 else notification.message
-        reply_message = f'Replied to your "{original_message_preview}": {message}'
-
+        # =====================================
+        # SEND REPLY TO ADMIN
+        # =====================================
         Notification.objects.create(
             sender=request.user,
             receiver=admin_user,
-            message=reply_message
+            message=message
         )
 
+        # =====================================
+        # SAVE COPY FOR CUSTOMER HISTORY
+        # =====================================
+        Notification.objects.create(
+            sender=request.user,
+            receiver=request.user,
+            message=f"You replied to {admin_user.username}: {message}"
+        )
+
+        # =====================================
+        # UPDATE ORIGINAL NOTIFICATION THREAD INFO
+        # =====================================
+        original_notification.is_read = True
+        original_notification.last_reply_message = message
+        original_notification.last_reply_sender = request.user.username
+        original_notification.last_reply_target = admin_user.username
+        original_notification.last_reply_time = timezone.now()
+        original_notification.save()
+
+        # =====================================
+        # LOG ACTIVITY
+        # =====================================
         log_activity(
             actor=request.user,
             customer=request.user,
             action="Replied to admin"
         )
 
-        notification.is_read = True
-        notification.save()
-
         return JsonResponse({
-            'success': True,
-            'message': 'Reply sent to admin successfully!'
+            "success": True,
+            "message": "Reply sent successfully!"
         })
 
     except Notification.DoesNotExist:
-        return JsonResponse({'success': False, 'error': 'Notification not found'}, status=404)
+        return JsonResponse(
+            {"success": False, "error": "Notification not found"},
+            status=404
+        )
+
     except Exception as e:
-        return JsonResponse({'success': False, 'error': str(e)}, status=500)
+        return JsonResponse(
+            {"success": False, "error": str(e)},
+            status=500
+        )
+        
 @login_required
 def mark_all_notifications_read(request):
     """Mark all notifications of the logged-in user as read"""
@@ -686,10 +779,28 @@ def customer_dashboard(request):
         user=request.user
     )
 
-    notifications = Notification.objects.filter(
+    notification_qs = Notification.objects.filter(
         receiver=request.user
     ).select_related('sender').order_by("-created_at")[:5]
 
+    notifications = [
+        {
+            "id": note.id,
+            "sender": note.sender.username if note.sender else "Admin",
+            "message": note.message,
+            "time": note.created_at.strftime("%d %b %Y, %I:%M %p"),
+            "is_read": note.is_read,
+
+            "last_reply_message": note.last_reply_message,
+            "last_reply_sender": note.last_reply_sender,
+            "last_reply_target": note.last_reply_target,
+            "last_reply_time": (
+                note.last_reply_time.strftime("%d %b %Y, %I:%M %p")
+                if note.last_reply_time else None
+            ),
+        }
+        for note in notification_qs
+    ]
     return render(
         request,
         "customer/dashboard.html",

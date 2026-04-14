@@ -184,8 +184,16 @@ class Notification(models.Model):
     )
 
     message = models.TextField()
+
     is_read = models.BooleanField(default=False)
+
     created_at = models.DateTimeField(auto_now_add=True)
+
+    # NEW FIELDS FOR LAST REPLY PREVIEW
+    last_reply_message = models.TextField(blank=True, null=True)
+    last_reply_sender = models.CharField(max_length=150, blank=True, null=True)
+    last_reply_time = models.DateTimeField(blank=True, null=True)
+    last_reply_target = models.CharField(max_length=150, blank=True, null=True)
 
     class Meta:
         ordering = ["-created_at"]

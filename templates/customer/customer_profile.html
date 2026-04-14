@@ -2,6 +2,7 @@
 {% load static %}
 {% block content %}
 
+<!-- ✅ FIXED: Proper CropperJS CSS link -->
 <link rel="stylesheet" href="https://unpkg.com/cropperjs@1.6.1/dist/cropper.css">
 
 <style>
@@ -184,6 +185,106 @@ input:disabled {
 #togglePasswordBtn {
     margin-top: 20px;
 }
+
+/* Professional Logout Modal */
+.logout-modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.5);
+    backdrop-filter: blur(4px);
+}
+
+.logout-modal-content {
+    background: white;
+    margin: 15% auto;
+    padding: 35px;
+    border-radius: 12px;
+    width: 90%;
+    max-width: 450px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    text-align: center;
+    animation: modalSlideIn 0.3s ease-out;
+}
+
+@keyframes modalSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-30px) scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+.logout-icon {
+    font-size: 64px;
+    color: #dc2626;
+    margin-bottom: 20px;
+    display: inline-block;
+    font-weight: 700;
+}
+
+.logout-modal h3 {
+    color: #1f2937;
+    margin-bottom: 12px;
+    font-size: 24px;
+    font-weight: 700;
+}
+
+.logout-modal p {
+    color: #6b7280;
+    line-height: 1.6;
+    margin-bottom: 30px;
+    font-size: 16px;
+}
+
+.logout-buttons {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+}
+
+.logout-confirm-btn {
+    padding: 12px 28px;
+    background: #dc2626;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    font-size: 15px;
+    flex: 1;
+    transition: all 0.2s ease;
+}
+
+.logout-confirm-btn:hover {
+    background: #b91c1c;
+    transform: translateY(-1px);
+}
+
+.logout-cancel-btn {
+    padding: 12px 28px;
+    background: #f3f4f6;
+    color: #374151;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    font-size: 15px;
+    flex: 1;
+    transition: all 0.2s ease;
+}
+
+.logout-cancel-btn:hover {
+    background: #e5e7eb;
+    transform: translateY(-1px);
+}
 </style>
 
 <div class="container">
@@ -193,7 +294,20 @@ input:disabled {
 
         <div class="top-actions">
             <a href="{% url 'accounts:customer_dashboard' %}" class="back-btn">← Back</a>
-            <a href="{% url 'accounts:logout' %}" class="logout-btn" onclick="return confirm('Are you sure you want to logout?')">🚪 Logout</a>
+            <a href="javascript:void(0);" class="logout-btn" onclick="showLogoutModal()">🚪 Logout</a>
+        </div>
+    </div>
+
+    <!-- Professional Logout Modal -->
+    <div id="logoutModal" class="logout-modal">
+        <div class="logout-modal-content">
+            <span class="logout-icon">⏻</span>
+            <h3>Confirm Logout</h3>
+            <p>Are you sure you want to logout? You'll need to login again to access your account.</p>
+            <div class="logout-buttons">
+                <button type="button" class="logout-confirm-btn" onclick="confirmLogout()">Yes, Logout</button>
+                <button type="button" class="logout-cancel-btn" onclick="hideLogoutModal()">Cancel</button>
+            </div>
         </div>
     </div>
 
@@ -206,7 +320,7 @@ input:disabled {
         {% endif %}
     {% endfor %}
 
-    <form method="post" id="profileForm">
+    <form method="post" id="profileForm" enctype="multipart/form-data">
         {% csrf_token %}
         <input type="hidden" name="cropped_image" id="croppedImage">
 
@@ -221,9 +335,18 @@ input:disabled {
                     </div>
                 {% endif %}
 
+                <!-- ✅ FIXED: All labels -->
                 <label>Profile Photo</label>
-                <input type="file" id="imageInput" accept="image/*">
 
+                <input type="file"
+                    id="imageInput"
+                    name="profile_photo"
+                    accept="image/*"
+                    style="display:none;">
+
+                <button type="button" id="uploadBtn" class="btn">
+                    📁 Choose Photo
+                </button>
                 <div id="uploadSection">
                     <div class="crop-wrapper">
                         <img id="preview">
@@ -238,10 +361,12 @@ input:disabled {
 
                 <label>Mobile Number</label>
                 <input type="tel"
-                       name="mobile"
-                       value="{{ profile.mobile }}"
-                       pattern="[0-9]{10}"
-                       maxlength="10">
+                    name="mobile"
+                    value="{{ profile.mobile }}"
+                    pattern="[0-9]{10}"
+                    maxlength="10"
+                    inputmode="numeric"
+                    oninput="this.value=this.value.replace(/[^0-9]/g,'').slice(0,10)">
 
                 <div class="card-footer">
                     <button class="btn" type="submit">
@@ -262,6 +387,7 @@ input:disabled {
                 </button>
 
                 <div id="passwordFields" style="display:none;">
+                    <!-- ✅ FIXED: All labels -->
                     <label>Current Password</label>
                     <input type="password" name="current_password">
 
@@ -275,11 +401,9 @@ input:disabled {
                         👁 Show / Hide Passwords
                     </span>
 
-                    
-                        <button class="btn btn-danger" type="submit">
-                            Update Password
-                        </button>
-                
+                    <button class="btn btn-danger" type="submit">
+                        Update Password
+                    </button>
                 </div>
             </div>
         </div>
@@ -295,26 +419,35 @@ const preview = document.getElementById("preview");
 const uploadSection = document.getElementById("uploadSection");
 const croppedImageInput = document.getElementById("croppedImage");
 
+const uploadBtn = document.getElementById("uploadBtn");
+
+uploadBtn.addEventListener("click", () => {
+    imageInput.click();
+});
+
 imageInput.addEventListener("change", function () {
     const file = this.files[0];
     if (!file) return;
+
+    uploadBtn.textContent = "✅ Photo Selected";
 
     uploadSection.style.display = "block";
 
     const reader = new FileReader();
     reader.onload = () => {
         preview.src = reader.result;
-        preview.onload = () => {
-            if (cropper) cropper.destroy();
-            cropper = new Cropper(preview, {
-                aspectRatio: 1,
-                viewMode: 1,
-                dragMode: "move",
-                cropBoxResizable: false,
-                cropBoxMovable: false,
-            });
-        };
+
+        if (cropper) cropper.destroy();
+
+        cropper = new Cropper(preview, {
+            aspectRatio: 1,
+            viewMode: 1,
+            dragMode: "move",
+            cropBoxResizable: false,
+            cropBoxMovable: false,
+        });
     };
+
     reader.readAsDataURL(file);
 });
 
@@ -347,6 +480,32 @@ btn.addEventListener("click", () => {
     fields.style.display = open ? "none" : "block";
     btn.textContent = open ? "Change Password" : "Cancel Password Change";
     btn.classList.toggle("btn-danger", !open);
+});
+
+function showLogoutModal() {
+    document.getElementById("logoutModal").style.display = "block";
+    document.body.style.overflow = "hidden";
+}
+
+function hideLogoutModal() {
+    document.getElementById("logoutModal").style.display = "none";
+    document.body.style.overflow = "auto";
+}
+
+function confirmLogout() {
+    window.location.href = "{% url 'accounts:logout' %}";
+}
+
+document.getElementById("logoutModal").addEventListener("click", function(e) {
+    if (e.target === this) {
+        hideLogoutModal();
+    }
+});
+
+document.addEventListener("keydown", function(e) {
+    if (e.key === "Escape") {
+        hideLogoutModal();
+    }
 });
 </script>
 

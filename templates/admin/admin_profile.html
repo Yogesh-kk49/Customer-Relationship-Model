@@ -172,6 +172,108 @@ input:disabled {
     margin-top: 8px;
     display: inline-block;
 }
+
+/* Professional Logout Modal */
+.logout-modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.5);
+    backdrop-filter: blur(4px);
+}
+
+.logout-modal-content {
+    background: white;
+    margin: 15% auto;
+    padding: 35px;
+    border-radius: 12px;
+    width: 90%;
+    max-width: 450px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    text-align: center;
+    animation: modalSlideIn 0.3s ease-out;
+}
+
+@keyframes modalSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-30px) scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+.logout-icon {
+    font-size: 64px;
+    background: linear-gradient(135deg, #dc2626, #b91c1c);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 20px;
+    display: block;
+}
+
+.logout-modal h3 {
+    color: #1f2937;
+    margin-bottom: 12px;
+    font-size: 24px;
+    font-weight: 700;
+}
+
+.logout-modal p {
+    color: #6b7280;
+    line-height: 1.6;
+    margin-bottom: 30px;
+    font-size: 16px;
+}
+
+.logout-buttons {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+}
+
+.logout-confirm-btn {
+    padding: 12px 28px;
+    background: #dc2626;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    font-size: 15px;
+    flex: 1;
+    transition: all 0.2s ease;
+}
+
+.logout-confirm-btn:hover {
+    background: #b91c1c;
+    transform: translateY(-1px);
+}
+
+.logout-cancel-btn {
+    padding: 12px 28px;
+    background: #f3f4f6;
+    color: #374151;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    font-size: 15px;
+    flex: 1;
+    transition: all 0.2s ease;
+}
+
+.logout-cancel-btn:hover {
+    background: #e5e7eb;
+    transform: translateY(-1px);
+}
 </style>
 
 <div class="container">
@@ -179,7 +281,20 @@ input:disabled {
         <h2>Admin Profile</h2>
         <div style="display: flex; gap: 10px;">
             <a href="{% url 'accounts:admin_dashboard' %}" class="back-btn">← Back</a>
-            <a href="{% url 'accounts:logout' %}" class="logout-btn" onclick="return confirm('Are you sure you want to logout?')">🚪 Logout</a>
+            <button class="logout-btn" onclick="showLogoutModal()">🚪 Logout</button>
+        </div>
+    </div>
+
+    <!-- Professional Logout Modal -->
+    <div id="logoutModal" class="logout-modal">
+        <div class="logout-modal-content">
+            <span class="logout-icon">⏻</span>
+            <h3>Confirm Logout</h3>
+            <p>Are you sure you want to logout? You'll need to login again to access your account.</p>
+            <div class="logout-buttons">
+                <button class="logout-confirm-btn" onclick="confirmLogout()">Yes, Logout</button>
+                <button class="logout-cancel-btn" onclick="hideLogoutModal()">Cancel</button>
+            </div>
         </div>
     </div>
 
@@ -225,10 +340,13 @@ input:disabled {
                 <input type="email" name="email" value="{{ request.user.email }}">
 
                 <label>Mobile Number</label>
-                <input type="tel" name="mobile" value="{{ business.mobile }}"
-                  pattern="[0-9]{10}" maxlength="10">
-
-
+                <input type="tel"
+                    name="mobile"
+                    value="{{ business.mobile }}"
+                    pattern="[0-9]{10}"
+                    maxlength="10"
+                    inputmode="numeric"
+                    oninput="this.value=this.value.replace(/[^0-9]/g,'').slice(0,10)">
                 <button class="btn" type="submit">Save Profile Changes</button>
             </div>
 
@@ -322,6 +440,22 @@ document.getElementById("profileForm").addEventListener("submit", function (e) {
     // Form now has proper File in profile_photo field
 });
 
+// Professional Logout Modal Functions
+function showLogoutModal() {
+    document.getElementById('logoutModal').style.display = 'block';
+    document.body.style.overflow = 'hidden';
+}
+
+function hideLogoutModal() {
+    document.getElementById('logoutModal').style.display = 'none';
+    document.body.style.overflow = 'auto';
+}
+
+function confirmLogout() {
+    // Redirect to Django logout URL
+    window.location.href = "{% url 'accounts:logout' %}";
+}
+
 function togglePassword() {
     document.querySelectorAll('#passwordFields input').forEach(i => {
         i.type = i.type === "password" ? "text" : "password";
@@ -336,6 +470,20 @@ btn.addEventListener("click", () => {
     fields.style.display = open ? "none" : "block";
     btn.textContent = open ? "Change Password" : "Cancel Password Change";
     btn.classList.toggle("btn-danger", !open);
+});
+
+// Close modal when clicking outside
+document.getElementById('logoutModal').addEventListener('click', function(e) {
+    if (e.target === this) {
+        hideLogoutModal();
+    }
+});
+
+// Close modal with Escape key
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+        hideLogoutModal();
+    }
 });
 </script>
 

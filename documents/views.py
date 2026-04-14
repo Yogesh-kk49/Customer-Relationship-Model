@@ -2,7 +2,6 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.contrib.auth import get_user_model
-from accounts.models import ActivityLog
 from .models import Document
 from accounts.models import ActivityLog, Notification, BusinessProfile
 
@@ -19,18 +18,24 @@ def customer_documents(request):
         return redirect("accounts:login")
 
     if request.method == "POST":
+        file = request.FILES.get("document_file")
+
+        if not file:
+            messages.error(request, "Please upload a file.")
+            return redirect("documents:customer_documents")
+
         # 1️⃣ Save document
         document = Document.objects.create(
             user=request.user,
             uploaded_by=request.user,
             document_type=request.POST.get("document_type"),
             title=request.POST.get("title"),
-            document_file=request.FILES.get("document_file"),
+            document_file=file,
             document_date=request.POST.get("document_date") or None,
             description=request.POST.get("description", "")
         )
 
-        # 2️⃣ Activity log (HISTORY) ✅ KEEP THIS
+        # 2️⃣ Activity log
         ActivityLog.objects.create(
             actor=request.user,
             customer=request.user,
@@ -41,7 +46,7 @@ def customer_documents(request):
         profile = get_object_or_404(BusinessProfile, user=request.user)
         admin_user = profile.created_by
 
-        # 4️⃣ Notification for admin 🔔
+        # 4️⃣ Notification for admin
         if admin_user:
             Notification.objects.create(
                 sender=request.user,
@@ -60,6 +65,7 @@ def customer_documents(request):
         {"documents": documents}
     )
 
+
 # ===============================
 # ADMIN: UPLOAD DOCUMENT FOR CUSTOMER
 # ===============================
@@ -69,18 +75,46 @@ def admin_upload_document(request, user_id):
         messages.error(request, "Access denied.")
         return redirect("accounts:login")
 
-    customer = get_object_or_404(User, id=user_id, role="customer")
+    profile = get_object_or_404(
+        BusinessProfile,
+        user__id=user_id,
+        user__role="customer",
+        created_by=request.user
+    )
+
+    customer = profile.user
 
     if request.method == "POST":
-        Document.objects.create(
+        file = request.FILES.get("document_file")
+
+        if not file:
+            messages.error(request, "Please upload a file.")
+            return redirect("documents:admin_upload_document", user_id=customer.id)
+
+        document = Document.objects.create(
             user=customer,
             uploaded_by=request.user,
             document_type=request.POST.get("document_type"),
             title=request.POST.get("title"),
-            document_file=request.FILES.get("document_file"),
+            document_file=file,
             document_date=request.POST.get("document_date") or None,
             description=request.POST.get("description", "")
         )
+
+        # Activity log for admin history
+        ActivityLog.objects.create(
+            actor=request.user,
+            customer=customer,
+            action=f"Uploaded document for customer: {customer.username}"
+        )
+
+        # Notify customer
+        Notification.objects.create(
+            sender=request.user,
+            receiver=customer,
+            message=f"📄 Admin uploaded a document for you: {document.title}"
+        )
+
         messages.success(request, "Document uploaded for customer.")
         return redirect("accounts:view_customer", user_id=customer.id)
 
@@ -105,7 +139,9 @@ def admin_all_documents(request):
         messages.error(request, "Access denied.")
         return redirect("accounts:login")
 
-    documents = Document.objects.select_related(
+    documents = Document.objects.filter(
+        user__businessprofile__created_by=request.user
+    ).select_related(
         "user", "uploaded_by"
     ).order_by("-created_at")
 
