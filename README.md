@@ -125,7 +125,6 @@ Then login at:
 ## 🚀 Future Improvements
 
 * REST API integration (Django REST Framework)
-* Role-based access control
 * Dashboard analytics & charts
 * Email notifications
 * Search & filtering improvements
