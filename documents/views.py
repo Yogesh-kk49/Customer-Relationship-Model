@@ -24,7 +24,7 @@ def customer_documents(request):
             messages.error(request, "Please upload a file.")
             return redirect("documents:customer_documents")
 
-        # 1️⃣ Save document
+       
         document = Document.objects.create(
             user=request.user,
             uploaded_by=request.user,
@@ -35,18 +35,18 @@ def customer_documents(request):
             description=request.POST.get("description", "")
         )
 
-        # 2️⃣ Activity log
+        
         ActivityLog.objects.create(
             actor=request.user,
             customer=request.user,
             action=f"Uploaded document: {document.title}"
         )
 
-        # 3️⃣ Find assigned admin
+       
         profile = get_object_or_404(BusinessProfile, user=request.user)
         admin_user = profile.created_by
 
-        # 4️⃣ Notification for admin
+    
         if admin_user:
             Notification.objects.create(
                 sender=request.user,

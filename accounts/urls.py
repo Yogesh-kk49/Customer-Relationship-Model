@@ -11,8 +11,6 @@ urlpatterns = [
 
     # HOME
     path("", views.home, name="home"),
-
-    # ADMIN AREA (❌ NOT under /admin/)
     path("dashboard/", views.admin_dashboard, name="admin_dashboard"),
     path("leads/", views.leads_list, name="leads"),
     path("profile/", views.admin_profile, name="admin_profile"),

@@ -31,8 +31,6 @@ button {
     cursor: pointer;
     margin-top: 12px;
 }
-
-/* ✅ SUCCESS MESSAGE STYLES */
 .success-message {
     background: linear-gradient(135deg, #10b981, #059669);
     color: white;
@@ -67,7 +65,6 @@ button {
 
 <div class="container">
     <div class="card">
-        <!-- ✅ CRITICAL: SUCCESS MESSAGE DISPLAY - WILL WORK -->
         {% if messages %}
             {% for message in messages %}
                 <div class="success-message">

@@ -271,7 +271,6 @@ body::before {
     width: 100%;
 }
 
-/* ✅ NEW SUCCESS MESSAGE STYLES */
 .success-message {
     background: linear-gradient(135deg, #10b981, #059669);
     color: white;
@@ -411,7 +410,7 @@ body::before {
 <div class="content">
     <div class="profile-container">
         {% if admin_user %}
-            <!-- ✅ SUCCESS MESSAGE DISPLAY -->
+    
             {% if messages %}
                 {% for message in messages %}
                     <div class="success-message">
@@ -447,12 +446,11 @@ body::before {
                 <div class="email-display">{{ admin_user.email }}</div>
             </div>
 
-            <!-- ✅ OPEN KEYPAD BUTTON (Toggle) -->
             <button type="button" id="toggleMessage" class="action-btn telegram-btn">
                 {% if messages %}✨ Send Another Message{% else %}📨 Send Secure Message to Admin{% endif %}
             </button>
 
-            <!-- ✅ HIDDEN MESSAGE FORM - OPENS ON CLICK -->
+          
             <form method="POST" id="messageForm" class="message-form">
                 {% csrf_token %}
                 <textarea name="message" class="message-textarea" required 
@@ -483,7 +481,6 @@ body::before {
             </div>
         {% endif %}
 
-        <!-- FIXED Back Button - Always Visible -->
         <div style="margin-top: 30px;">
             <a href="{% url 'accounts:customer_dashboard' %}" class="back-btn">
                 ← Back to Dashboard
@@ -493,7 +490,6 @@ body::before {
 </div>
 
 <script>
-// ✅ Smooth toggle functionality for message form
 document.addEventListener('DOMContentLoaded', function() {
     const toggleBtn = document.getElementById('toggleMessage');
     const messageForm = document.getElementById('messageForm');

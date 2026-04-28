@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}MyCRM{% endblock %}</title>
     
-    <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     
     <style>
@@ -21,7 +20,6 @@
             line-height: 1.6;
         }
 
-        /* ✅ HEADER - PERFECT DARK BG */
         header {
             background: #111827 !important;
             color: white !important;
@@ -62,7 +60,7 @@
             background: #dc2626;
         }
 
-        /* ✅ BULLETPROOF NOTIFICATION BELL */
+     
         .notification-bell {
             position: relative !important;
             display: inline-flex !important;
@@ -84,7 +82,7 @@
             transform: scale(1.1);
         }
 
-        /* ✅ SERVER-CONTROLLED RED DOT - UNBREAKABLE */
+  
         .notification-dot {
             position: absolute !important;
             top: -4px !important;
@@ -100,7 +98,7 @@
             opacity: 1 !important;
         }
 
-        /* ✅ FORCE DOT VISIBLE ON ALL STATES */
+    
         .notification-bell:hover .notification-dot,
         .notification-bell:focus .notification-dot,
         .notification-bell:active .notification-dot,
@@ -115,7 +113,6 @@
             100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
         }
 
-        /* ✅ PERFECT DARK TEXT NOTIFICATIONS */
         .notification-dropdown {
             position: absolute !important;
             top: 100% !important;
@@ -186,7 +183,6 @@
             color: white !important;
         }
 
-        /* ✅ FIXED CENTERED CONTAINER */
         .container {
             max-width: 1200px !important;
             margin: 0 auto !important;
@@ -245,14 +241,13 @@
             {% endif %}
 
             {% block header_right %}
-                <!-- ✅ BULLETPROOF NOTIFICATION SYSTEM -->
+
                 {% if show_notifications and request.user.is_authenticated and request.user.is_staff %}
                     <div class="notification-container" style="position: relative;">
                         
                         <!-- BELL LINK - GOES TO NOTIFICATIONS PAGE -->
                         <a href="{% url 'accounts:admin_dashboard' %}" class="notification-bell">
                             🔔
-                            <!-- ✅ SERVER CONTROLLED - IMPOSSIBLE TO BREAK -->
                             {% if unread_count > 0 %}
                                 <span class="notification-dot"></span>
                             {% endif %}
@@ -302,7 +297,7 @@
         </div>
         {% endblock %}
 
-    <!-- ✅ ZERO JS - PURE SERVER LOGIC -->
+   
     <script>
     document.addEventListener('DOMContentLoaded', function() {
         console.log('✅ Base template loaded - Pure server-controlled notifications');

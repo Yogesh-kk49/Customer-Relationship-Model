@@ -2,7 +2,6 @@
 {% load static %}
 {% block content %}
 
-<!-- ✅ FIXED: Proper CropperJS CSS link -->
 <link rel="stylesheet" href="https://unpkg.com/cropperjs@1.6.1/dist/cropper.css">
 
 <style>
@@ -24,7 +23,6 @@
     gap: 10px;
 }
 
-/* 🔴 RED BUTTONS */
 .back-btn,
 .logout-btn {
     background: #dc2626;
@@ -335,7 +333,7 @@ input:disabled {
                     </div>
                 {% endif %}
 
-                <!-- ✅ FIXED: All labels -->
+            
                 <label>Profile Photo</label>
 
                 <input type="file"
@@ -375,7 +373,7 @@ input:disabled {
                 </div>
             </div>
 
-            <!-- RIGHT : CHANGE PASSWORD -->
+        
             <div class="card">
                 <div class="security-title">Account Security</div>
                 <div class="security-desc">
@@ -387,7 +385,7 @@ input:disabled {
                 </button>
 
                 <div id="passwordFields" style="display:none;">
-                    <!-- ✅ FIXED: All labels -->
+                  
                     <label>Current Password</label>
                     <input type="password" name="current_password">
 

@@ -12,7 +12,6 @@
     --border: #e5e7eb;
 }
 
-/* ✅ FULL-WIDTH CONTAINER (CENTERED) */
 .container {
     max-width: 1400px;          /* controls max stretch on big screens */
     width: 100%;
@@ -20,7 +19,6 @@
     padding: 0 24px;
 }
 
-/* 🔴 TOP BAR */
 .top-bar {
     display: flex;
     justify-content: flex-end;
@@ -63,7 +61,6 @@
     margin-bottom: 24px;
 }
 
-/* ✅ MESSAGE STYLES */
 .message {
     padding: 14px 18px;
     border-radius: 10px;
@@ -171,7 +168,7 @@ th {
     text-decoration: underline;
 }
 
-/* 📱 MOBILE RESPONSIVE */
+
 @media (max-width: 768px) {
     .upload-form {
         grid-template-columns: 1fr;
@@ -191,7 +188,7 @@ th {
         <a href="javascript:history.back()" class="back-btn">← Back</a>
     </div>
 
-    <!-- ✅ DJANGO MESSAGES -->
+
     {% if messages %}
         {% for message in messages %}
             <div class="message {{ message.tags }}">

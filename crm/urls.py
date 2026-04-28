@@ -5,7 +5,7 @@ from django.conf import settings
 from django.conf.urls.static import static
 
 def home(request):
-    return render(request, "home.html")  # ✅ CORRECT
+    return render(request, "home.html")  
 
 urlpatterns = [
     path("", home, name="home"),

@@ -233,7 +233,7 @@ def admin_dashboard(request):
         }
     )
 # ---------------- ADMIN VIEW CUSTOMER ----------------
-@login_required  # ✅ FIXED: Only ONE decorator
+@login_required  
 def view_customer(request, user_id):
     if request.user.role != "admin":
         messages.error(request, "Access denied.")
@@ -707,10 +707,6 @@ def send_reply(request):
             receiver=admin_user,
             message=message
         )
-
-        # =====================================
-        # SAVE COPY FOR CUSTOMER HISTORY
-        # =====================================
         Notification.objects.create(
             sender=request.user,
             receiver=request.user,
@@ -844,34 +840,31 @@ def contact_admin(request):
                 # Save contact message
                 ContactMessage.objects.create(customer=request.user, message=message)
                 
-                # ✅ ADMIN NOTIFICATION - sender = customer
                 Notification.objects.create(
                     sender=request.user,        # Customer sending to admin
                     receiver=admin_user,        # Admin receives
                     message=f" {request.user.username}: {message[:50]}"
                 )
                 
-                # ✅ CUSTOMER CONFIRMATION - sender = customer (self-notification)
+             
                 Notification.objects.create(
                     sender=request.user,        # Customer notifies self
                     receiver=request.user,      # Customer receives confirmation
                     message=f"You sent to {admin_user.username}: {message[:50]}"
                 )
                 
-                # ✅ SUCCESS MESSAGE - This will show in your template!
                 messages.success(
                     request, 
                     f"Message sent successfully to {admin_user.username}! ✨"
                 )
                 
-                # 🔄 REDIRECT TO SAME PAGE to show success message
+                
                 return redirect('accounts:contact_admin')
                 
             except Exception as e:
                 messages.error(request, f"Error sending message: {str(e)}")
                 return redirect('accounts:contact_admin')
     
-    # Show admin profile page
     return render(
         request, 
         "customer/contact_admin.html",

@@ -76,7 +76,6 @@
         background: #1e40af;
     }
 
-    /* Enhanced success message styles (added close button support) */
     .success-message {
         background: #10b981;
         color: white;
@@ -248,7 +247,6 @@
     }
 </style>
 
-<!-- ADD THIS SUCCESS MESSAGE BLOCK (right after page-wrapper div opens) -->
 <div class="page-wrapper">
     {% if message_sent %}
     <div class="success-message" id="successMsg">
@@ -368,7 +366,6 @@
     </div>
 </div>
 
-<!-- Your existing script unchanged + success message JS added -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script>
 document.addEventListener("DOMContentLoaded", function() {

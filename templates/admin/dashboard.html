@@ -128,10 +128,6 @@ header {
     100% { transform: scale(1); }
 }
 
-/* ========================================
-   DASHBOARD NOTIFICATION DROPDOWN
-======================================== */
-
 .dashboard-notification-box {
     position: absolute;
     top: 72px;
@@ -813,13 +809,13 @@ tr:last-child td {
         </div>
 
         <div class="header-right">
-            <!-- 🔔 Bell - Notifications -->
+            
             <button class="bell" onclick="toggleNotifications()" id="bellIcon" aria-label="Notifications">
                 🔔
                 <span class="bell-dot" id="bellDot"></span>
             </button>
 
-            <!-- 🔔 Notifications dropdown -->
+        
             <div class="dashboard-notification-box" id="notificationBox">
                 <div class="dashboard-notification-header">
                     Notifications 
@@ -827,7 +823,7 @@ tr:last-child td {
                 </div>
                 
                 <div class="dashboard-notification-content" id="notificationContent">
-                    <!-- Content will be populated by JavaScript -->
+                    
                 </div>
             </div>
 
