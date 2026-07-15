@@ -4,15 +4,24 @@
 <style>
     .container {
         max-width: 1100px;
-        margin: 60px auto;
+        margin: 30px auto 60px;
+        padding: 0 20px;
     }
 
     .card {
         background: white;
         padding: 30px;
-        border-radius: 12px;
+        border-radius: 14px;
         box-shadow: 0 6px 20px rgba(0,0,0,0.08);
         margin-bottom: 25px;
+        opacity: 0;
+        animation: cardIn 0.35s ease forwards;
+    }
+    .card:nth-of-type(2) { animation-delay: 0.06s; }
+
+    @keyframes cardIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
     }
 
     h2 {
@@ -21,11 +30,18 @@
     }
 
     input {
-        padding: 10px;
+        padding: 11px 12px;
         width: 100%;
         margin-bottom: 12px;
-        border-radius: 6px;
-        border: 1px solid #d1d5db;
+        border-radius: 8px;
+        border: 1.5px solid #d1d5db;
+        transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    input:focus {
+        outline: none;
+        border-color: #2563eb;
+        box-shadow: 0 0 0 4px rgba(37,99,235,0.12);
     }
 
     table {
@@ -34,29 +50,51 @@
     }
 
     th, td {
-        padding: 12px;
+        padding: 14px 12px;
         border-bottom: 1px solid #e5e7eb;
         text-align: left;
     }
 
     th {
         background: #f9fafb;
+        font-weight: 700;
+        color: #374151;
+        font-size: 13.5px;
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
+    }
+
+    tbody tr {
+        transition: background-color 0.15s ease;
+    }
+
+    tbody tr:hover {
+        background: #f8fafc;
     }
 
     .btn {
-        padding: 6px 14px;
-        border-radius: 6px;
+        padding: 8px 16px;
+        border-radius: 8px;
         text-decoration: none;
-        font-size: 14px;
+        font-size: 13.5px;
+        font-weight: 600;
         border: none;
         cursor: pointer;
         color: white;
         background: #2563eb;
+        transition: all 0.2s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
     }
 
     .btn:hover {
         background: #1e40af;
+        transform: translateY(-1px);
+        box-shadow: 0 6px 14px rgba(37,99,235,0.25);
     }
+
+    .btn:active { transform: translateY(0); }
 
     .btn-delete {
         background: #dc2626;
@@ -64,6 +102,7 @@
 
     .btn-delete:hover {
         background: #b91c1c;
+        box-shadow: 0 6px 14px rgba(220,38,38,0.25);
     }
 
     .btn-convert {
@@ -72,28 +111,38 @@
 
     .btn-convert:hover {
         background: #15803d;
+        box-shadow: 0 6px 14px rgba(22,163,74,0.25);
     }
 
     .back-btn {
         display: inline-block;
         margin-bottom: 18px;
-        padding: 6px 14px;
-        border-radius: 6px;
+        padding: 8px 16px;
+        border-radius: 8px;
         background: #dc2626;
         color: white;
         text-decoration: none;
         font-weight: 600;
+        font-size: 13.5px;
+        transition: all 0.2s ease;
     }
 
     .back-btn:hover {
         background: #b91c1c;
+        transform: translateY(-1px);
     }
 
     .msg {
-        padding: 12px;
-        border-radius: 6px;
+        padding: 13px 16px;
+        border-radius: 8px;
         margin-bottom: 15px;
         font-weight: 500;
+        animation: msgSlide 0.3s ease;
+    }
+
+    @keyframes msgSlide {
+        from { opacity: 0; transform: translateY(-6px); }
+        to { opacity: 1; transform: translateY(0); }
     }
 
     .msg-success {
@@ -125,6 +174,21 @@
         display: flex;
         gap: 10px;
         align-items: center;
+    }
+
+    #leadForm {
+        transition: opacity 0.25s ease;
+    }
+
+    .empty-row {
+        text-align: center;
+        padding: 40px 20px !important;
+        color: #9ca3af;
+    }
+    .empty-row .empty-icon {
+        font-size: 36px;
+        display: block;
+        margin-bottom: 8px;
     }
 </style>
 
@@ -200,7 +264,10 @@
                 </tr>
                 {% empty %}
                 <tr>
-                    <td colspan="3">No leads found.</td>
+                    <td colspan="3" class="empty-row">
+                        <span class="empty-icon">📋</span>
+                        No leads found. Click "+ Add Lead" to create one.
+                    </td>
                 </tr>
                 {% endfor %}
             </tbody>
@@ -212,7 +279,14 @@
 <script>
 function toggleLeadForm() {
     const form = document.getElementById("leadForm");
-    form.style.display = form.style.display === "none" ? "block" : "none";
+    if (form.style.display === "none" || !form.style.display) {
+        form.style.display = "block";
+        form.style.opacity = "0";
+        requestAnimationFrame(() => { form.style.opacity = "1"; });
+    } else {
+        form.style.opacity = "0";
+        setTimeout(() => { form.style.display = "none"; }, 200);
+    }
 }
 </script>
 

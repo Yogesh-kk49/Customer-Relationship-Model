@@ -1,19 +1,29 @@
 {% extends "base.html" %}
 {% load static %}
+{% block title %}Activity History · MyCRM{% endblock %}
 {% block content %}
 
 <style>
 .container {
     max-width: 1100px;
-    margin: 80px auto;
-    padding: 20px;
+    margin: 30px auto 60px;
+    padding: 0 20px;
 }
 .card {
     background: white;
     padding: 30px;
-    border-radius: 12px;
+    border-radius: 14px;
     box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+    opacity: 0;
+    animation: cardIn 0.35s ease forwards;
 }
+@keyframes cardIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+.card h2 { color: #1f2937; margin-bottom: 6px; }
+.card > p { color: #6b7280; margin-bottom: 4px; }
+
 table {
     width: 100%;
     border-collapse: collapse;
@@ -23,18 +33,37 @@ th, td {
     padding: 14px;
     border-bottom: 1px solid #e5e7eb;
     text-align: left;
+    font-size: 14px;
 }
 th {
     background: #f9fafb;
     font-weight: 700;
+    color: #374151;
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+}
+tbody tr {
+    transition: background-color 0.15s ease;
+}
+tbody tr:hover {
+    background: #f8fafc;
+}
+.badge-admin,
+.badge-customer {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 999px;
+    font-weight: 700;
+    font-size: 12px;
 }
 .badge-admin {
     color: #1e40af;
-    font-weight: 600;
+    background: #dbeafe;
 }
 .badge-customer {
     color: #047857;
-    font-weight: 600;
+    background: #d1fae5;
 }
 .back-btn {
     display: inline-block;
@@ -42,11 +71,26 @@ th {
     padding: 8px 16px;
     background: #dc2626;
     color: white;
-    border-radius: 6px;
+    border-radius: 8px;
     text-decoration: none;
     font-weight: 600;
+    font-size: 13.5px;
+    transition: all 0.2s ease;
 }
-.back-btn:hover { background: #b91c1c; }
+.back-btn:hover {
+    background: #b91c1c;
+    transform: translateY(-1px);
+}
+.empty-row {
+    text-align: center;
+    padding: 40px 20px !important;
+    color: #9ca3af;
+}
+.empty-row .empty-icon {
+    font-size: 36px;
+    display: block;
+    margin-bottom: 8px;
+}
 </style>
 
 <div class="container">
@@ -57,7 +101,7 @@ th {
 
     <div class="card">
         <h2>Activity History</h2>
-        <p>Admin & Customer activity logs</p>
+        <p>Admin &amp; customer activity logs</p>
 
         <table>
             <thead>
@@ -66,7 +110,7 @@ th {
                     <th>Role</th>
                     <th>Action</th>
                     <th>Customer</th>
-                    <th>Date & Time</th>
+                    <th>Date &amp; Time</th>
                 </tr>
             </thead>
             <tbody>
@@ -75,7 +119,7 @@ th {
                     <td>{{ log.actor.username }}</td>
                     <td>
                         {% if log.actor.role == "admin" %}
-                            <span class="badge-admin">Admin</️</span>
+                            <span class="badge-admin">Admin</span>
                         {% else %}
                             <span class="badge-customer">Customer</span>
                         {% endif %}
@@ -92,7 +136,8 @@ th {
                 </tr>
                 {% empty %}
                 <tr>
-                    <td colspan="5" style="text-align:center;">
+                    <td colspan="5" class="empty-row">
+                        <span class="empty-icon">🕓</span>
                         No activity recorded yet.
                     </td>
                 </tr>

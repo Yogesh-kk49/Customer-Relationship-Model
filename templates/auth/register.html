@@ -1,50 +1,88 @@
 {% extends "base.html" %}
 {% load static %}
 
+{% block title %}Create Account · MyCRM{% endblock %}
+
 {% block content %}
 <style>
     .auth-wrapper {
         display: flex;
         justify-content: center;
         align-items: center;
-        min-height: 90vh;
-        background: #f4f6f9;
+        min-height: calc(100vh - 200px);
+        padding: 24px;
     }
 
     .auth-box {
-        width: 420px;
+        width: 100%;
+        max-width: 440px;
         background: #ffffff;
-        padding: 35px;
-        border-radius: 10px;
-        box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+        padding: 40px 38px 34px;
+        border-radius: 18px;
+        box-shadow: var(--shadow-lg, 0 20px 45px rgba(15,23,42,0.12));
+        border: 1px solid #eef1f5;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .auth-box::before {
+        content: '';
+        position: absolute;
+        top: 0; left: 0; right: 0;
+        height: 5px;
+        background: linear-gradient(90deg, #2563eb, #60a5fa);
+    }
+
+    .brand-mark {
+        width: 52px;
+        height: 52px;
+        margin: 0 auto 16px;
+        border-radius: 14px;
+        background: linear-gradient(135deg, #2563eb, #1d4ed8);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 10px 24px rgba(37,99,235,0.3);
+        font-size: 24px;
     }
 
     .auth-box h2 {
         text-align: center;
-        margin-bottom: 10px;
-        font-size: 26px;
+        margin-bottom: 6px;
+        font-size: 25px;
+        font-weight: 700;
         color: #111827;
     }
 
-    .auth-box p {
+    .auth-box p.lead {
         text-align: center;
         font-size: 14px;
         color: #6b7280;
-        margin-bottom: 10px;
+        margin-bottom: 20px;
     }
 
-    /* ADMIN NOTE */
     .admin-note {
         text-align: center;
         font-size: 13px;
         color: #92400e;
         background: #fffbeb;
         border: 1px solid #fde68a;
-        padding: 10px;
-        border-radius: 6px;
-        margin-bottom: 20px;
+        padding: 10px 14px;
+        border-radius: 10px;
+        margin-bottom: 22px;
         font-weight: 500;
     }
+
+    .message {
+        padding: 12px 16px;
+        border-radius: 10px;
+        margin-bottom: 20px;
+        font-weight: 500;
+        font-size: 13.5px;
+        border: 1px solid;
+    }
+    .error { color: #b91c1c; background: #fef2f2; border-color: #fecaca; }
+    .success { color: #047857; background: #ecfdf5; border-color: #a7f3d0; }
 
     .form-group {
         margin-bottom: 18px;
@@ -52,55 +90,103 @@
 
     .form-group label {
         display: block;
-        margin-bottom: 6px;
-        font-weight: 500;
+        margin-bottom: 7px;
+        font-weight: 600;
         color: #374151;
+        font-size: 13.5px;
     }
+
+    .input-wrap { position: relative; }
 
     .form-group input {
         width: 100%;
-        padding: 10px;
-        border-radius: 6px;
-        border: 1px solid #d1d5db;
+        padding: 12px 14px;
+        border-radius: 10px;
+        border: 1.5px solid #e2e8f0;
         font-size: 15px;
+        background: #f9fafb;
+        transition: all 0.2s ease;
+        outline: none;
     }
 
     .form-group input:focus {
-        outline: none;
         border-color: #2563eb;
+        background: #fff;
+        box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.12);
+    }
+
+    .form-group input[type="password"] { padding-right: 44px; }
+
+    .toggle-pw {
+        position: absolute;
+        right: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+        background: none;
+        border: none;
+        cursor: pointer;
+        font-size: 16px;
+        color: #9ca3af;
+        padding: 4px 6px;
+    }
+    .toggle-pw:hover { color: #2563eb; }
+
+    .hint {
+        font-size: 12px;
+        color: #9ca3af;
+        margin-top: 5px;
     }
 
     .submit-btn {
         width: 100%;
-        padding: 12px;
+        padding: 13px;
         background: #2563eb;
         color: white;
         border: none;
-        border-radius: 6px;
-        font-size: 16px;
+        border-radius: 10px;
+        font-size: 15.5px;
+        font-weight: 600;
         cursor: pointer;
+        transition: all 0.2s ease;
+        margin-top: 6px;
     }
 
-    .submit-btn:hover {
-        background: #1d4ed8;
-    }
+    .submit-btn:hover { background: #1d4ed8; transform: translateY(-1px); box-shadow: 0 10px 20px rgba(37,99,235,0.28); }
 
     .footer-text {
         text-align: center;
-        margin-top: 15px;
+        margin-top: 18px;
         font-size: 14px;
+        color: #6b7280;
     }
 
     .footer-text a {
         color: #2563eb;
         text-decoration: none;
+        font-weight: 600;
+    }
+    .footer-text a:hover { text-decoration: underline; }
+
+    @media (max-width: 480px) {
+        .auth-box { padding: 32px 24px; }
     }
 </style>
 
 <div class="auth-wrapper">
     <div class="auth-box">
+        <div class="brand-mark">📇</div>
         <h2>Create Account</h2>
-        <p>Register to access your dashboard</p>
+        <p class="lead">Register to access your dashboard</p>
+
+        {% if messages %}
+            {% for message in messages %}
+                {% if message.tags == "success" %}
+                    <div class="message success">{{ message }}</div>
+                {% else %}
+                    <div class="message error">{{ message }}</div>
+                {% endif %}
+            {% endfor %}
+        {% endif %}
 
         <!-- ADMIN NOTICE -->
         <div class="admin-note">
@@ -111,29 +197,35 @@
             {% csrf_token %}
 
             <div class="form-group">
-                <label>Username</label>
-                <input type="text" name="username" placeholder="Enter username" required>
+                <label for="id_reg_username">Username</label>
+                <input type="text" id="id_reg_username" name="username" placeholder="Enter username" required>
             </div>
 
             <div class="form-group">
-                <label>Email</label>
-                <input type="email" name="email" placeholder="Enter email address" required>
+                <label for="id_reg_email">Email</label>
+                <input type="email" id="id_reg_email" name="email" placeholder="Enter email address" required>
             </div>
 
             <div class="form-group">
-                <label>Password</label>
-                <input type="password" name="password" placeholder="Create password" required>
+                <label for="id_reg_password">Password</label>
+                <div class="input-wrap">
+                    <input type="password" id="id_reg_password" name="password" placeholder="Create password" required>
+                    <button type="button" class="toggle-pw" onclick="togglePassword('id_reg_password', this)" aria-label="Show password">👁</button>
+                </div>
             </div>
 
             <div class="form-group">
-                <label>Mobile Number</label>
-                <input 
-                    type="text" 
-                    name="mobile" 
-                    placeholder="10-digit mobile number" 
-                    pattern="[0-9]{10}" 
+                <label for="id_reg_mobile">Mobile Number</label>
+                <input
+                    type="text"
+                    id="id_reg_mobile"
+                    name="mobile"
+                    placeholder="10-digit mobile number"
+                    pattern="[0-9]{10}"
+                    title="Enter a 10-digit mobile number"
                     required
                 >
+                <div class="hint">Digits only, no spaces or country code.</div>
             </div>
 
             <button type="submit" class="submit-btn">Create Account</button>
@@ -145,4 +237,14 @@
         </div>
     </div>
 </div>
+
+<script>
+    function togglePassword(fieldId, btn) {
+        const field = document.getElementById(fieldId);
+        const isHidden = field.type === 'password';
+        field.type = isHidden ? 'text' : 'password';
+        btn.textContent = isHidden ? '🙈' : '👁';
+        btn.setAttribute('aria-label', isHidden ? 'Hide password' : 'Show password');
+    }
+</script>
 {% endblock %}

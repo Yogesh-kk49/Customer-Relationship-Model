@@ -140,7 +140,7 @@ def admin_all_documents(request):
         return redirect("accounts:login")
 
     documents = Document.objects.filter(
-        user__businessprofile__created_by=request.user
+        user__business_profile__created_by=request.user
     ).select_related(
         "user", "uploaded_by"
     ).order_by("-created_at")

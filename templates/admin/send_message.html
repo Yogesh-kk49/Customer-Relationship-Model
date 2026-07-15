@@ -1,65 +1,98 @@
 {% extends "base.html" %}
+{% block title %}Message {{ customer.username }} · MyCRM{% endblock %}
 {% block content %}
 
 <style>
 .container {
     max-width: 600px;
-    margin: 40px auto;
+    margin: 30px auto 60px;
+    padding: 0 20px;
 }
 
 .card {
     background: #fff;
     padding: 30px;
-    border-radius: 12px;
+    border-radius: 14px;
     box-shadow: 0 10px 28px rgba(0,0,0,0.08);
+    opacity: 0;
+    animation: cardIn 0.35s ease forwards;
+}
+
+@keyframes cardIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+h2 {
+    color: #1f2937;
+    margin-bottom: 18px;
 }
 
 textarea {
     width: 100%;
     min-height: 120px;
-    padding: 12px;
-    border-radius: 8px;
-    border: 1px solid #d1d5db;
+    padding: 14px;
+    border-radius: 10px;
+    border: 1.5px solid #d1d5db;
+    font-size: 15px;
+    font-family: inherit;
+    resize: vertical;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+textarea:focus {
+    outline: none;
+    border-color: #2563eb;
+    box-shadow: 0 0 0 4px rgba(37,99,235,0.12);
 }
 
 button {
     background: #2563eb;
     color: white;
     border: none;
-    padding: 12px 20px;
-    border-radius: 6px;
+    padding: 12px 24px;
+    border-radius: 8px;
     cursor: pointer;
-    margin-top: 12px;
+    margin-top: 14px;
+    font-weight: 600;
+    font-size: 14.5px;
+    transition: all 0.2s ease;
 }
-.success-message {
-    background: linear-gradient(135deg, #10b981, #059669);
-    color: white;
-    padding: 20px;
+
+button:hover {
+    background: #1d4ed8;
+    transform: translateY(-1px);
+    box-shadow: 0 8px 18px rgba(37,99,235,0.28);
+}
+
+.status-message {
+    padding: 16px 20px;
     border-radius: 12px;
     margin-bottom: 24px;
     text-align: center;
     font-weight: 600;
-    box-shadow: 0 10px 30px rgba(16,185,129,0.3);
-    animation: slideDown 0.5s ease-out;
-    border: 2px solid rgba(255,255,255,0.3);
-    position: relative;
+    animation: slideDown 0.4s ease-out;
+    border: 1px solid transparent;
 }
+
+.status-message.success {
+    background: linear-gradient(135deg, #10b981, #059669);
+    color: white;
+    box-shadow: 0 10px 30px rgba(16,185,129,0.3);
+    border-color: rgba(255,255,255,0.3);
+}
+.status-message.success::before { content: '✅ '; }
+
+.status-message.error {
+    background: #fef2f2;
+    color: #b91c1c;
+    border-color: #fecaca;
+}
+.status-message.error::before { content: '⚠️ '; }
 
 @keyframes slideDown {
-    from {
-        opacity: 0;
-        transform: translateY(-20px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-.success-message::before {
-    content: '✅';
-    margin-right: 10px;
-    font-size: 20px;
+    from { opacity: 0; transform: translateY(-20px); }
+    to { opacity: 1; transform: translateY(0); }
 }
 </style>
 
@@ -67,7 +100,7 @@ button {
     <div class="card">
         {% if messages %}
             {% for message in messages %}
-                <div class="success-message">
+                <div class="status-message {% if message.tags == 'success' %}success{% else %}error{% endif %}">
                     {{ message }}
                 </div>
             {% endfor %}

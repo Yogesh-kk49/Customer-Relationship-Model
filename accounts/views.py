@@ -276,6 +276,10 @@ def view_customer(request, user_id):
 # ---------------- ADMIN PROFILE ----------------
 @login_required
 def admin_profile(request):
+    if request.user.role != "admin":
+        messages.error(request, "Access denied.")
+        return redirect("accounts:login")
+
     user = request.user
     profile, _ = BusinessProfile.objects.get_or_create(user=user)
 
@@ -354,6 +358,10 @@ def admin_profile(request):
 # ---------------- LEADS ----------------
 @login_required
 def leads_list(request):
+    if request.user.role != "admin":
+        messages.error(request, "Access denied.")
+        return redirect("accounts:login")
+
     if request.method == "POST":
         username = request.POST.get("username")
         email = request.POST.get("email")
@@ -393,6 +401,10 @@ def delete_lead(request, lead_id):
 # ---------------- CONVERT LEAD ----------------
 @login_required
 def convert_lead(request, lead_id):
+    if request.user.role != "admin":
+        messages.error(request, "Access denied.")
+        return redirect("accounts:login")
+
     lead = get_object_or_404(Lead, id=lead_id)
 
     if request.method == "POST":
@@ -516,6 +528,10 @@ def customer_business_profile(request):
     )
 @login_required
 def customer_profile(request):
+    if request.user.role != "customer":
+        messages.error(request, "Access denied.")
+        return redirect("accounts:login")
+
     user = request.user
     profile, _ = Customer.objects.get_or_create(user=user)
 

@@ -271,7 +271,8 @@
     <div class="avatar-wrapper">
         {% if customer.profile_photo %}
             <div class="avatar">
-                <img src="{{ customer.profile_photo.url }}" alt="Profile">
+                <img src="{{ customer.profile_photo.url }}" alt="{{ customer.user.username }}"
+                     onerror="this.outerHTML='{{ customer.user.username|slice:':2'|upper }}'">
             </div>
         {% else %}
             <div class="avatar">
@@ -332,7 +333,14 @@
     </div>
 
     <div class="card" style="margin-top:30px;">
-        <h3>Uploaded Documents</h3>
+        <h3 style="display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap;">
+            Uploaded Documents
+            <a href="{% url 'documents:admin_upload_document' user_id=customer_user.id %}"
+               style="background:#2563eb; color:#fff; padding:9px 18px; border-radius:8px; font-size:13.5px; font-weight:600; text-decoration:none; transition:all 0.2s ease;"
+               onmouseover="this.style.background='#1d4ed8'" onmouseout="this.style.background='#2563eb'">
+                📤 Upload Document
+            </a>
+        </h3>
 
         {% if documents %}
             <table class="doc-table">

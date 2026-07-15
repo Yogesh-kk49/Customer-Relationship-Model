@@ -1,44 +1,143 @@
 {% extends "base.html" %}
+{% load static %}
+{% block title %}Help & Support · MyCRM{% endblock %}
 {% block content %}
 
 <style>
+* {
+    box-sizing: border-box;
+}
+
 .container {
     max-width: 900px;
-    margin: 80px auto;
-    padding: 20px;
-}
-
-.card {
-    background: white;
-    padding: 30px;
-    border-radius: 12px;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.08);
-}
-
-h2 {
-    margin-bottom: 10px;
-}
-
-ul {
-    margin-top: 15px;
-    padding-left: 20px;
-}
-
-li {
-    margin-bottom: 10px;
+    margin: 30px auto 60px;
+    padding: 0 16px;
 }
 
 .back-btn {
     display: inline-block;
-    margin-bottom: 16px;
-    padding: 8px 16px;
     background: #dc2626;
     color: white;
-    border-radius: 6px;
-    text-decoration: none;
+    padding: 10px 18px;
+    border-radius: 10px;
+    font-size: 14px;
     font-weight: 600;
+    text-decoration: none;
+    margin-bottom: 20px;
+    transition: all 0.2s ease;
 }
-.back-btn:hover { background: #b91c1c; }
+.back-btn:hover {
+    background: #b91c1c;
+    transform: translateY(-1px);
+}
+
+.card {
+    background: #fff;
+    padding: 32px;
+    border-radius: 14px;
+    box-shadow: 0 12px 30px rgba(0,0,0,0.08);
+    opacity: 0;
+    animation: cardIn 0.35s ease forwards;
+}
+
+@keyframes cardIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+h1 {
+    font-size: 28px;
+    color: #111827;
+    margin-bottom: 8px;
+}
+
+.subtitle {
+    color: #6b7280;
+    font-size: 16px;
+    margin-bottom: 30px;
+}
+
+.help-section { margin-bottom: 40px; }
+
+.help-section h3 {
+    font-size: 20px;
+    color: #111827;
+    margin-bottom: 16px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid #2563eb;
+}
+
+.help-item {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 20px;
+    padding: 16px;
+    background: #f8fafc;
+    border-radius: 10px;
+    border-left: 4px solid #2563eb;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.help-item:hover {
+    transform: translateX(4px);
+    box-shadow: 0 6px 16px rgba(0,0,0,0.06);
+}
+
+.help-icon {
+    font-size: 24px;
+    width: 48px;
+    height: 48px;
+    background: #eff6ff;
+    color: #2563eb;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.help-content h4 {
+    margin: 0 0 8px 0;
+    font-size: 16px;
+    font-weight: 600;
+    color: #111827;
+}
+
+.help-content p {
+    margin: 0;
+    color: #4b5563;
+    line-height: 1.6;
+}
+
+.contact-section {
+    text-align: center;
+    padding: 40px;
+    background: linear-gradient(135deg, #2563eb, #1e40af);
+    color: white;
+    border-radius: 16px;
+    margin-top: 40px;
+}
+
+.contact-section h3 {
+    font-size: 24px;
+    margin-bottom: 16px;
+}
+
+.contact-btn {
+    background: white;
+    color: #2563eb;
+    padding: 14px 32px;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 16px;
+    text-decoration: none;
+    display: inline-block;
+    margin-top: 20px;
+    transition: all 0.2s ease;
+}
+.contact-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 24px rgba(0,0,0,0.2);
+}
 </style>
 
 <div class="container">
@@ -48,21 +147,68 @@ li {
     </a>
 
     <div class="card">
-        <h2>Help & Support</h2>
-        <p>Welcome to the MyCRM Admin Help section.</p>
+        <h1>🆘 Help &amp; Support</h1>
+        <p class="subtitle">Everything you need to run your CRM as an admin</p>
 
-        <ul>
-            <li><strong>Create Customer:</strong> Use “Create New Customer” to onboard users.</li>
-            <li><strong>View Customers:</strong> Click “View” to see customer business details.</li>
-            <li><strong>Delete Customer:</strong> Deletes customer permanently.</li>
-            <li><strong>Leads:</strong> Manage leads and convert them to customers.</li>
-            <li><strong>Profile:</strong> Update admin profile and password securely.</li>
-            <li><strong>History:</strong> Track all admin and customer actions.</li>
-        </ul>
+        <div class="help-section">
+            <h3>📋 Frequently Asked Questions</h3>
 
-        <p>If you face issues, contact system administrator.</p>
+            <div class="help-item">
+                <div class="help-icon">➕</div>
+                <div class="help-content">
+                    <h4>How do I onboard a new customer?</h4>
+                    <p>Use <strong>Create New Customer</strong> on your dashboard to set up their login and business profile in one step.</p>
+                </div>
+            </div>
+
+            <div class="help-item">
+                <div class="help-icon">👁️</div>
+                <div class="help-content">
+                    <h4>How do I view a customer's details?</h4>
+                    <p>Click <strong>View</strong> next to any customer in your dashboard list to see their business profile, documents, and history.</p>
+                </div>
+            </div>
+
+            <div class="help-item">
+                <div class="help-icon">📊</div>
+                <div class="help-content">
+                    <h4>How does lead conversion work?</h4>
+                    <p>Open <strong>Leads</strong>, then click <strong>Convert</strong> on a lead to turn it into a full customer account.</p>
+                </div>
+            </div>
+
+            <div class="help-item">
+                <div class="help-icon">📄</div>
+                <div class="help-content">
+                    <h4>How do I upload a document for a customer?</h4>
+                    <p>From a customer's profile page, use <strong>Upload Document</strong> to attach bills, dues, or reports on their behalf.</p>
+                </div>
+            </div>
+
+            <div class="help-item">
+                <div class="help-icon">🕓</div>
+                <div class="help-content">
+                    <h4>Where can I see activity history?</h4>
+                    <p>Visit <strong>History</strong> to track every action you and your customers have taken across the platform.</p>
+                </div>
+            </div>
+
+            <div class="help-item">
+                <div class="help-icon">🔒</div>
+                <div class="help-content">
+                    <h4>How do I update my profile or password?</h4>
+                    <p>Go to <strong>Profile</strong> to update your contact details, photo, or change your password securely.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="help-section">
+            <div class="contact-section">
+                <h3>Still need help?</h3>
+                <p style="font-size: 16px; opacity: 0.9;">Reach out to the system administrator for further assistance.</p>
+            </div>
+        </div>
     </div>
-
 </div>
 
 {% endblock %}

@@ -51,12 +51,11 @@ INSTALLED_APPS = [
 ]
 AUTH_USER_MODEL = "accounts.User"
 
-AUTH_USER_MODEL = 'accounts.User'
-LOGIN_URL = 'login'
-LOGIN_REDIRECT_URL = 'admin_dashboard'
-LOGOUT_REDIRECT_URL = 'login'
+LOGIN_URL = 'accounts:login'
+LOGIN_REDIRECT_URL = 'accounts:admin_dashboard'
+LOGOUT_REDIRECT_URL = 'accounts:login'
 MEDIA_URL = "/media/"
-MEDIA_ROOT = os.path.join(BASE_DIR, "media")
+MEDIA_ROOT = BASE_DIR / "media"
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -125,9 +124,6 @@ AUTH_PASSWORD_VALIDATORS = [
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
-
-MEDIA_URL = "/media/"
-MEDIA_ROOT = BASE_DIR / "media"
 
 
 # Internationalization

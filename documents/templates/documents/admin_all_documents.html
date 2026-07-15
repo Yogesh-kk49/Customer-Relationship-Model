@@ -1,0 +1,246 @@
+{% extends "base.html" %}
+{% block title %}All Documents · MyCRM{% endblock %}
+{% block content %}
+
+<style>
+:root {
+    --primary: #2563eb;
+    --dark: #020617;
+    --muted: #6b7280;
+    --bg: #f3f4f6;
+    --card: #ffffff;
+    --border: #e5e7eb;
+}
+
+.container {
+    max-width: 1400px;
+    width: 100%;
+    margin: 30px auto 60px;
+    padding: 0 24px;
+}
+
+.top-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.top-bar h1 {
+    font-size: 26px;
+    color: var(--dark);
+}
+
+.back-btn {
+    padding: 10px 18px;
+    background: #dc2626;
+    color: white;
+    text-decoration: none;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 600;
+}
+.back-btn:hover { background: #b91c1c; }
+
+.panel {
+    background: var(--card);
+    padding: 32px;
+    border-radius: 18px;
+    box-shadow: 0 12px 30px rgba(0,0,0,.08);
+    width: 100%;
+    opacity: 0;
+    animation: fadeInUp 0.4s ease forwards;
+}
+
+@keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.panel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.panel-header p { color: var(--muted); margin: 0; }
+
+.doc-count {
+    background: #eff6ff;
+    color: var(--primary);
+    font-weight: 700;
+    font-size: 13px;
+    padding: 6px 14px;
+    border-radius: 999px;
+}
+
+.filter-bar {
+    display: flex;
+    gap: 10px;
+    margin: 20px 0;
+    flex-wrap: wrap;
+}
+
+.filter-chip {
+    padding: 8px 16px;
+    border-radius: 999px;
+    border: 1.5px solid var(--border);
+    background: #f9fafb;
+    color: #374151;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+.filter-chip:hover { border-color: var(--primary); color: var(--primary); }
+.filter-chip.active { background: var(--primary); color: white; border-color: var(--primary); }
+
+.table-wrapper { width: 100%; overflow-x: auto; }
+
+table { width: 100%; border-collapse: collapse; margin-top: 12px; }
+
+th, td {
+    padding: 16px 18px;
+    border-bottom: 1px solid var(--border);
+    text-align: left;
+    font-size: 14px;
+}
+
+th {
+    background: #f9fafb;
+    font-weight: 700;
+    color: #374151;
+    position: sticky;
+    top: 0;
+}
+
+tbody tr { transition: background 0.15s ease; opacity: 0; animation: rowIn 0.3s ease forwards; }
+tbody tr:hover { background: #f8fafc; }
+
+@keyframes rowIn {
+    from { opacity: 0; transform: translateX(-6px); }
+    to { opacity: 1; transform: translateX(0); }
+}
+
+.doc-type {
+    font-weight: 700;
+    color: var(--primary);
+    text-transform: capitalize;
+}
+
+.badge {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 11.5px;
+    font-weight: 700;
+    text-transform: capitalize;
+}
+.badge.bill { background: #fef3c7; color: #92400e; }
+.badge.due { background: #fee2e2; color: #991b1b; }
+.badge.report { background: #dbeafe; color: #1d4ed8; }
+
+.link-group { display: flex; gap: 12px; }
+
+.download-link {
+    color: var(--primary);
+    font-weight: 600;
+    text-decoration: none;
+    font-size: 13.5px;
+}
+.download-link:hover { text-decoration: underline; }
+
+.empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--muted);
+}
+.empty-state .empty-icon { font-size: 46px; margin-bottom: 12px; }
+
+@media (max-width: 768px) {
+    .panel { padding: 22px; }
+}
+</style>
+
+<div class="container">
+    <div class="top-bar">
+        <h1>📂 All Customer Documents</h1>
+        <a href="javascript:history.back()" class="back-btn">← Back</a>
+    </div>
+
+    <div class="panel">
+        <div class="panel-header">
+            <p>Every document your customers and your team have uploaded, in one place.</p>
+            <span class="doc-count">{{ documents.count }} document{{ documents.count|pluralize }}</span>
+        </div>
+
+        <div class="filter-bar" id="filterBar">
+            <button type="button" class="filter-chip active" data-filter="all" onclick="filterDocs('all', this)">All</button>
+            <button type="button" class="filter-chip" data-filter="bill" onclick="filterDocs('bill', this)">Bills</button>
+            <button type="button" class="filter-chip" data-filter="due" onclick="filterDocs('due', this)">Dues</button>
+            <button type="button" class="filter-chip" data-filter="report" onclick="filterDocs('report', this)">Reports</button>
+        </div>
+
+        <div class="table-wrapper">
+            <table id="docsTable">
+                <thead>
+                    <tr>
+                        <th>Customer</th>
+                        <th>Type</th>
+                        <th>Title</th>
+                        <th>Uploaded By</th>
+                        <th>Date</th>
+                        <th>File</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for doc in documents %}
+                        <tr data-type="{{ doc.document_type }}" style="animation-delay: {{ forloop.counter0|floatformat:0 }}0ms">
+                            <td>{{ doc.user.username }}</td>
+                            <td><span class="badge {{ doc.document_type }}">{{ doc.get_document_type_display }}</span></td>
+                            <td>{{ doc.title }}</td>
+                            <td>{{ doc.uploaded_by.username|default:"—" }}</td>
+                            <td>{{ doc.created_at|date:"d M Y, h:i A" }}</td>
+                            <td>
+                                <div class="link-group">
+                                    <a href="{{ doc.document_file.url }}" target="_blank" class="download-link">View</a>
+                                    <a href="{{ doc.document_file.url }}" download class="download-link">Download</a>
+                                </div>
+                            </td>
+                        </tr>
+                    {% empty %}
+                        <tr>
+                            <td colspan="6">
+                                <div class="empty-state">
+                                    <div class="empty-icon">📭</div>
+                                    No documents have been uploaded yet.
+                                </div>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+function filterDocs(type, btn) {
+    document.querySelectorAll('#filterBar .filter-chip').forEach(c => c.classList.remove('active'));
+    btn.classList.add('active');
+    document.querySelectorAll('#docsTable tbody tr').forEach(row => {
+        if (type === 'all' || row.dataset.type === type) {
+            row.style.display = '';
+        } else {
+            row.style.display = 'none';
+        }
+    });
+}
+</script>
+
+{% endblock %}

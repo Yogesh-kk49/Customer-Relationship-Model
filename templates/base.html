@@ -3,287 +3,526 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="MyCRM — manage customers, leads and activity in one place.">
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='6' fill='%232563eb'/%3E%3Cpath d='M7 12.5l3 3 7-7' stroke='white' stroke-width='2' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
     <title>{% block title %}MyCRM{% endblock %}</title>
-    
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
     <style>
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --primary-light: #eff6ff;
+            --dark: #0b1120;
+            --dark-light: #111827;
+            --muted: #6b7280;
+            --text: #1f2937;
+            --bg: #f4f6f9;
+            --card: #ffffff;
+            --border: #e5e7eb;
+            --success: #10b981;
+            --success-light: #ecfdf5;
+            --danger: #ef4444;
+            --danger-light: #fef2f2;
+            --radius: 12px;
+            --shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.06);
+            --shadow-md: 0 8px 24px rgba(15, 23, 42, 0.08);
+            --shadow-lg: 0 20px 45px rgba(15, 23, 42, 0.12);
+        }
+
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
 
-        body {
-            font-family: 'Poppins', sans-serif;
-            background: #f4f6f9;
-            line-height: 1.6;
+        html {
+            scroll-behavior: smooth;
         }
 
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+            min-height: 100vh;
+        }
+
+        a { color: inherit; }
+
+        /* ===================== SKIP LINK ===================== */
+        .skip-link {
+            position: absolute;
+            left: -999px;
+            top: auto;
+            background: var(--primary);
+            color: #fff;
+            padding: 10px 16px;
+            border-radius: 8px;
+            z-index: 3000;
+        }
+        .skip-link:focus {
+            left: 16px;
+            top: 16px;
+        }
+
+        /* ===================== HEADER ===================== */
         header {
-            background: #111827 !important;
+            background: linear-gradient(180deg, var(--dark-light), var(--dark)) !important;
             color: white !important;
-            padding: 15px 25px;
+            padding: 14px 24px;
             display: flex;
             align-items: center;
+            gap: 16px;
             position: sticky;
             top: 0;
             z-index: 1000;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 12px rgba(0,0,0,0.15);
         }
 
         .logo {
-            font-size: 22px;
-            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 11px;
+            font-size: 19px;
+            font-weight: 700;
             color: white !important;
+            text-decoration: none !important;
+            letter-spacing: -0.2px;
+            flex-shrink: 0;
+        }
+
+        .logo-mark {
+            width: 34px;
+            height: 34px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 3px 10px rgba(37,99,235,0.45), inset 0 1px 0 rgba(255,255,255,0.25);
+            transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            flex-shrink: 0;
+        }
+
+        .logo-mark svg {
+            width: 19px;
+            height: 19px;
+            display: block;
+        }
+
+        .logo:hover .logo-mark {
+            transform: rotate(-6deg) scale(1.06);
+        }
+
+        .logo-word {
+            display: inline-flex;
+            align-items: baseline;
+        }
+
+        .logo-word .accent {
+            color: #60a5fa;
         }
 
         .header-right {
             margin-left: auto;
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 6px;
+            position: relative;
         }
 
-        .back-btn {
-            padding: 8px 14px;
-            background: #ef4444;
-            color: white !important;
-            text-decoration: none;
-            border-radius: 6px;
+        /* ===================== NAV LINKS ===================== */
+        .main-nav {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .nav-link {
+            padding: 9px 14px;
+            border-radius: 8px;
+            color: rgba(255,255,255,0.82) !important;
+            text-decoration: none !important;
             font-size: 14px;
             font-weight: 500;
+            transition: all 0.18s ease;
+            white-space: nowrap;
+        }
+
+        .nav-link:hover {
+            background: rgba(255,255,255,0.1) !important;
+            color: #fff !important;
+        }
+
+        .nav-link.active {
+            background: rgba(37,99,235,0.35) !important;
+            color: #fff !important;
+        }
+
+        .nav-btn {
+            padding: 9px 16px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            text-decoration: none !important;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+        }
+
+        .nav-btn-primary {
+            background: var(--primary) !important;
+            color: #fff !important;
+            box-shadow: 0 4px 12px rgba(37,99,235,0.35);
+        }
+        .nav-btn-primary:hover {
+            background: var(--primary-dark) !important;
+            transform: translateY(-1px);
+        }
+
+        .nav-btn-danger {
+            background: rgba(239,68,68,0.15) !important;
+            color: #fca5a5 !important;
+            border: 1px solid rgba(239,68,68,0.3);
+        }
+        .nav-btn-danger:hover {
+            background: var(--danger) !important;
+            color: #fff !important;
+            border-color: var(--danger);
+        }
+
+        /* ===================== MOBILE NAV TOGGLE ===================== */
+        .nav-toggle {
+            display: none;
+            background: rgba(255,255,255,0.1);
+            border: none;
+            color: #fff;
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            font-size: 18px;
+            cursor: pointer;
+            align-items: center;
+            justify-content: center;
+        }
+        .nav-toggle:hover { background: rgba(255,255,255,0.18); }
+
+        .mobile-nav-panel {
+            display: none;
+            position: absolute;
+            top: calc(100% + 8px);
+            right: 0;
+            background: var(--dark-light);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 12px;
+            box-shadow: var(--shadow-lg);
+            min-width: 220px;
+            flex-direction: column;
+            padding: 8px;
+            gap: 2px;
+            z-index: 1400;
+        }
+        .mobile-nav-panel.active { display: flex; }
+        .mobile-nav-panel .nav-link,
+        .mobile-nav-panel .nav-btn { width: 100%; text-align: left; }
+
+        /* ===================== NOTIFICATION BELL ===================== */
+        .notification-container { position: relative; }
+
+        .notification-bell {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            background: rgba(255,255,255,0.1);
+            border: none;
+            border-radius: 50%;
+            color: #ffffff;
+            font-size: 18px;
+            cursor: pointer;
             transition: all 0.2s ease;
         }
 
-        .back-btn:hover {
-            background: #dc2626;
-        }
-
-     
-        .notification-bell {
-            position: relative !important;
-            display: inline-flex !important;
-            align-items: center;
-            justify-content: center;
-            width: 44px !important;
-            height: 44px !important;
-            background: rgba(255,255,255,0.15) !important;
-            border-radius: 50% !important;
-            color: #ffffff !important;
-            font-size: 20px !important;
-            text-decoration: none !important;
-            transition: all 0.3s ease;
-            backdrop-filter: blur(10px);
-        }
-
         .notification-bell:hover {
-            background: rgba(255,255,255,0.25) !important;
-            transform: scale(1.1);
+            background: rgba(255,255,255,0.2);
+            transform: scale(1.06);
         }
 
-  
         .notification-dot {
-            position: absolute !important;
-            top: -4px !important;
-            right: -4px !important;
-            width: 12px !important;
-            height: 12px !important;
-            background: #ef4444 !important;
-            border: 3px solid #111827 !important;
-            border-radius: 50% !important;
-            animation: pulse 2s infinite !important;
-            z-index: 9999 !important;
-            display: block !important;
-            opacity: 1 !important;
-        }
-
-    
-        .notification-bell:hover .notification-dot,
-        .notification-bell:focus .notification-dot,
-        .notification-bell:active .notification-dot,
-        .notification-bell:visited .notification-dot {
-            display: block !important;
-            opacity: 1 !important;
+            position: absolute;
+            top: -2px;
+            right: -2px;
+            width: 11px;
+            height: 11px;
+            background: var(--danger);
+            border: 2px solid var(--dark-light);
+            border-radius: 50%;
+            animation: pulse 2s infinite;
         }
 
         @keyframes pulse {
-            0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.8); }
+            0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
             70% { box-shadow: 0 0 0 8px rgba(239, 68, 68, 0); }
             100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
         }
 
         .notification-dropdown {
-            position: absolute !important;
-            top: 100% !important;
-            right: 0 !important;
-            background: #ffffff !important;
-            min-width: 350px !important;
-            max-height: 500px;
+            position: absolute;
+            top: calc(100% + 10px);
+            right: 0;
+            background: #ffffff;
+            width: 360px;
+            max-width: 88vw;
+            max-height: 480px;
             overflow-y: auto;
-            border-radius: 12px !important;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.15) !important;
-            border: 1px solid #e5e7eb !important;
-            z-index: 1001 !important;
-            margin-top: 8px;
-            color: #1f2937 !important;
-            display: none !important;
+            border-radius: 14px;
+            box-shadow: var(--shadow-lg);
+            border: 1px solid var(--border);
+            z-index: 1500;
+            color: var(--text);
+            display: none;
+            animation: dropIn 0.16s ease;
+        }
+        .notification-dropdown.active { display: block; }
+
+        @keyframes dropIn {
+            from { opacity: 0; transform: translateY(-6px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         .notification-header {
-            padding: 16px 20px !important;
-            background: #f8fafc !important;
-            border-bottom: 1px solid #e5e7eb !important;
-            font-weight: 600 !important;
-            color: #1f2937 !important;
-            font-size: 14px !important;
+            padding: 14px 18px;
+            background: #f8fafc;
+            border-bottom: 1px solid var(--border);
+            font-weight: 700;
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+            color: #334155;
         }
 
         .notification-item {
-            padding: 16px 20px !important;
-            border-bottom: 1px solid #f3f4f6 !important;
-            color: #374151 !important;
-            font-weight: 500 !important;
-            text-decoration: none !important;
-            display: block !important;
-            transition: background 0.2s ease;
+            padding: 14px 18px;
+            border-bottom: 1px solid #f3f4f6;
+            color: #374151;
+            font-weight: 500;
+            font-size: 13.5px;
+            text-decoration: none;
+            display: block;
+            transition: background 0.15s ease;
         }
+        .notification-item:last-child { border-bottom: none; }
 
-        .notification-item:hover {
-            background: #f8fafc !important;
-        }
+        .notification-item:hover { background: #f8fafc; }
 
         .notification-item.unread {
-            background: #eff6ff !important;
-            color: #1f2937 !important;
-            font-weight: 600 !important;
-            border-left: 4px solid #2563eb !important;
+            background: var(--primary-light);
+            color: #1f2937;
+            font-weight: 600;
+            border-left: 3px solid var(--primary);
+        }
+
+        .notification-item small { color: #94a3b8; }
+
+        .notification-empty {
+            text-align: center;
+            color: #9ca3af;
+            padding: 28px 18px;
+            font-size: 13.5px;
         }
 
         .notification-footer {
-            padding: 12px 20px !important;
-            border-top: 1px solid #e5e7eb !important;
-            text-align: center !important;
+            padding: 10px;
+            border-top: 1px solid var(--border);
+            text-align: center;
         }
 
         .mark-read-btn {
-            display: inline-block !important;
-            padding: 8px 16px !important;
-            background: #2563eb !important;
-            color: white !important;
-            text-decoration: none !important;
-            border-radius: 6px !important;
-            font-size: 13px !important;
-            font-weight: 500 !important;
-            transition: all 0.2s ease;
+            display: inline-block;
+            padding: 8px 16px;
+            background: var(--primary);
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-size: 12.5px;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            font-family: inherit;
+        }
+        .mark-read-btn:hover { background: var(--primary-dark); }
+
+        a, button {
+            transition: color 0.18s ease, background-color 0.18s ease, border-color 0.18s ease,
+                        box-shadow 0.18s ease, transform 0.18s ease, opacity 0.18s ease;
         }
 
-        .mark-read-btn:hover {
-            background: #1d4ed8 !important;
-            color: white !important;
+        /* Consistent, visible keyboard focus without being intrusive on click */
+        a:focus-visible,
+        button:focus-visible,
+        input:focus-visible,
+        textarea:focus-visible,
+        select:focus-visible {
+            outline: 2px solid var(--primary);
+            outline-offset: 2px;
         }
 
+        /* Page entrance */
+        @keyframes pageFadeIn {
+            from { opacity: 0; transform: translateY(6px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        main { animation: pageFadeIn 0.35s ease both; }
+
+        /* Reusable utility classes any page can opt into */
+        .lift-on-hover {
+            transition: transform 0.22s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.22s ease;
+        }
+        .lift-on-hover:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-md);
+        }
+
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .spinner {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(37,99,235,0.25);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 0.7s linear infinite;
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.001ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.001ms !important;
+                scroll-behavior: auto !important;
+            }
+        }
+
+        /* ===================== LAYOUT ===================== */
         .container {
-            max-width: 1200px !important;
-            margin: 0 auto !important;
-            padding: 30px 20px !important;
-            width: 100% !important;
-            min-height: calc(100vh - 80px);
-            display: block !important;
-            position: relative !important;
-            left: 0 !important;
-            right: 0 !important;
-            box-sizing: border-box !important;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 30px 20px;
+            width: 100%;
+            min-height: calc(100vh - 130px);
+            box-sizing: border-box;
         }
 
-        /* OVERRIDE FOR CHILD PAGES */
         .container > .container {
-            max-width: 1100px !important;
-            margin: 96px auto 60px !important;
+            max-width: 1100px;
+            margin: 30px auto 60px !important;
             padding: 0 16px !important;
+            min-height: unset;
         }
 
-        /* RESPONSIVE */
+        /* ===================== FOOTER ===================== */
+        .site-footer {
+            background: var(--dark-light);
+            color: rgba(255,255,255,0.65);
+            padding: 22px 24px;
+            text-align: center;
+            font-size: 13px;
+        }
+        .site-footer a { color: rgba(255,255,255,0.85); text-decoration: none; }
+        .site-footer a:hover { color: #fff; text-decoration: underline; }
+
+        /* ===================== RESPONSIVE ===================== */
+        @media (max-width: 860px) {
+            .main-nav { display: none; }
+            .nav-toggle { display: inline-flex; }
+        }
+
         @media (max-width: 768px) {
-            .container { 
-                padding: 20px 16px !important; 
-                margin: 80px 16px 40px 16px !important;
-            }
-            .container > .container {
-                margin: 96px 16px 40px !important;
-                padding: 0 !important;
-            }
-            header { padding: 12px 20px; }
-        }
-
-        /* FORCE CENTERING FOR ALL NESTED CONTAINERS */
-        body .container,
-        body .container * {
-            max-width: 100% !important;
+            .container { padding: 20px 16px; }
+            .container > .container { margin: 20px auto 40px !important; padding: 0 !important; }
+            header { padding: 12px 16px; }
         }
     </style>
 </head>
 
 <body>
+    <a href="#main-content" class="skip-link">Skip to content</a>
+
     <!-- GLOBAL CSRF TOKEN -->
     <form style="display: none;">
         {% csrf_token %}
     </form>
 
     <!-- HEADER -->
-     {% block show_header %}
+    {% block show_header %}
     <header>
-        <div class="logo">MyCRM</div>
-        
+        <a href="{% url 'accounts:home' %}" class="logo">
+            <span class="logo-mark">
+                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="7" cy="7" r="3" stroke="white" stroke-width="1.8"/>
+                    <circle cx="17" cy="7" r="3" stroke="white" stroke-width="1.8"/>
+                    <circle cx="12" cy="17" r="3" stroke="white" stroke-width="1.8"/>
+                    <path d="M9.2 8.6L11 14.3M14.8 8.6L13 14.3M9.6 6H14.4" stroke="white" stroke-width="1.6" stroke-linecap="round"/>
+                </svg>
+            </span>
+            <span class="logo-word">My<span class="accent">CRM</span></span>
+        </a>
+
         <div class="header-right">
-            {% if request.resolver_match.url_name == 'login' or request.resolver_match.url_name == 'register' %}
-                <a href="{% url 'accounts:home' %}" class="back-btn">← Back</a>
+            {% block header_right %}
+            <nav class="main-nav" aria-label="Primary">
+                {% include "partials/nav_links.html" %}
+            </nav>
+
+            {% if show_notifications and request.user.is_authenticated and request.user.is_staff %}
+                <div class="notification-container">
+                    <button type="button" class="notification-bell" id="baseBell" onclick="toggleBaseNotifications(event)" aria-label="Notifications">
+                        🔔
+                        {% if unread_count > 0 %}
+                            <span class="notification-dot"></span>
+                        {% endif %}
+                    </button>
+
+                    <div class="notification-dropdown" id="baseNotificationDropdown">
+                        <div class="notification-header">
+                            Notifications
+                            <span style="color: var(--primary); font-weight: 700;">{{ unread_count|default:0 }} unread</span>
+                        </div>
+
+                        {% if notifications %}
+                            {% for notification in notifications %}
+                                <a href="{% url 'accounts:admin_dashboard' %}"
+                                   class="notification-item {% if not notification.is_read %}unread{% endif %}">
+                                    {{ notification.message|truncatechars:80 }}
+                                    <br><small>{{ notification.created_at|date:"M d, Y h:i A" }}</small>
+                                </a>
+                            {% endfor %}
+                        {% else %}
+                            <div class="notification-empty">You're all caught up — no notifications.</div>
+                        {% endif %}
+
+                        {% if unread_count > 0 %}
+                            <div class="notification-footer">
+                                <button type="button" class="mark-read-btn" onclick="markAllBaseNotificationsRead(event)">
+                                    Mark All Read
+                                </button>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
             {% endif %}
 
-            {% block header_right %}
-
-                {% if show_notifications and request.user.is_authenticated and request.user.is_staff %}
-                    <div class="notification-container" style="position: relative;">
-                        
-                        <!-- BELL LINK - GOES TO NOTIFICATIONS PAGE -->
-                        <a href="{% url 'accounts:admin_dashboard' %}" class="notification-bell">
-                            🔔
-                            {% if unread_count > 0 %}
-                                <span class="notification-dot"></span>
-                            {% endif %}
-                        </a>
-                        
-                        <!-- DROPDOWN - HIDDEN BY CSS -->
-                        <div class="notification-dropdown">
-                            <div class="notification-header">
-                                Notifications 
-                                <span style="color: #ef4444; font-weight: 700;">({{ unread_count|default:0 }})</span>
-                            </div>
-                            
-                            {% if notifications %}
-                                {% for notification in notifications %}
-                                    <a href="{% url 'accounts:admin_dashboard' %}" 
-                                       class="notification-item {% if not notification.is_read %}unread{% endif %}">
-                                        {{ notification.message|truncatechars:80 }}
-                                        <br><small style="color: #6b7280;">{{ notification.created_at|date:"M d, Y h:i A" }}</small>
-                                    </a>
-                                {% endfor %}
-                            {% else %}
-                                <div class="notification-item" style="text-align: center; color: #6b7280; cursor: default;">
-                                    No notifications
-                                </div>
-                            {% endif %}
-                            
-                            {% if unread_count > 0 %}
-                                <div class="notification-footer">
-                                    <a href="{% url 'accounts:mark_all_notifications_read' %}" class="mark-read-btn">
-                                        Mark All Read
-                                    </a>
-                                </div>
-                            {% endif %}
-                        </div>
-                    </div>
-                {% endif %}
+            <button type="button" class="nav-toggle" id="navToggle" onclick="toggleMobileNav(event)" aria-label="Open menu">☰</button>
+            <div class="mobile-nav-panel" id="mobileNavPanel">
+                {% include "partials/nav_links.html" %}
+            </div>
             {% endblock %}
         </div>
     </header>
@@ -291,16 +530,79 @@
 
     <!-- MAIN CONTENT -->
     {% block page_wrapper %}
-        <div class="container">
-            {% block content %}
-            {% endblock %}
-        </div>
-        {% endblock %}
+        <main id="main-content">
+            <div class="container">
+                {% block content %}
+                {% endblock %}
+            </div>
+        </main>
 
-   
+        {% block footer %}
+        <footer class="site-footer">
+            &copy; {% now "Y" %} MyCRM. All rights reserved. &middot;
+            <a href="{% url 'accounts:home' %}">Home</a>
+        </footer>
+        {% endblock %}
+    {% endblock %}
+
     <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        console.log('✅ Base template loaded - Pure server-controlled notifications');
+    document.addEventListener('DOMContentLoaded', function () {
+        // Mobile nav toggle
+        window.toggleMobileNav = function (e) {
+            e.stopPropagation();
+            var panel = document.getElementById('mobileNavPanel');
+            if (panel) panel.classList.toggle('active');
+        };
+
+        // Notification dropdown toggle (bell in the shared header)
+        window.toggleBaseNotifications = function (e) {
+            e.stopPropagation();
+            var dropdown = document.getElementById('baseNotificationDropdown');
+            if (dropdown) dropdown.classList.toggle('active');
+        };
+
+        // Mark all notifications read (proper POST, not a bare link)
+        window.markAllBaseNotificationsRead = function (e) {
+            e.stopPropagation();
+            var btn = e.currentTarget;
+            var csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+            btn.disabled = true;
+            fetch('{% url "accounts:mark_all_notifications_read" %}', {
+                method: 'POST',
+                headers: { 'X-CSRFToken': csrfToken }
+            })
+            .then(function (r) { return r.json(); })
+            .then(function (data) {
+                if (data.success) {
+                    document.querySelectorAll('.notification-item.unread').forEach(function (el) {
+                        el.classList.remove('unread');
+                    });
+                    var dot = document.querySelector('#baseBell .notification-dot');
+                    if (dot) dot.remove();
+                    var footer = btn.closest('.notification-footer');
+                    if (footer) footer.remove();
+                } else {
+                    btn.disabled = false;
+                }
+            })
+            .catch(function () { btn.disabled = false; });
+        };
+
+        document.addEventListener('click', function (e) {
+            var panel = document.getElementById('mobileNavPanel');
+            var toggle = document.getElementById('navToggle');
+            if (panel && panel.classList.contains('active') &&
+                !panel.contains(e.target) && (!toggle || !toggle.contains(e.target))) {
+                panel.classList.remove('active');
+            }
+
+            var dropdown = document.getElementById('baseNotificationDropdown');
+            var bell = document.getElementById('baseBell');
+            if (dropdown && dropdown.classList.contains('active') &&
+                !dropdown.contains(e.target) && (!bell || !bell.contains(e.target))) {
+                dropdown.classList.remove('active');
+            }
+        });
     });
     </script>
 </body>

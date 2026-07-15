@@ -4,7 +4,8 @@
 <style>
 .container {
     max-width: 900px;
-    margin: 40px auto;
+    margin: 30px auto 60px;
+    padding: 0 20px;
 }
 
 /* Top bar */
@@ -13,20 +14,24 @@
     justify-content: space-between;
     align-items: center;
     margin-bottom: 20px;
+    flex-wrap: wrap;
+    gap: 12px;
 }
 
 .back-btn {
     background: #dc2626; /* red */
     color: white;
     padding: 8px 16px;
-    border-radius: 6px;
+    border-radius: 8px;
     text-decoration: none;
     font-weight: 600;
-    font-size: 14px;
+    font-size: 13.5px;
+    transition: all 0.2s ease;
 }
 
 .back-btn:hover {
     background: #b91c1c;
+    transform: translateY(-1px);
 }
 
 .card {
@@ -34,6 +39,13 @@
     padding: 28px;
     border-radius: 14px;
     box-shadow: 0 10px 28px rgba(0,0,0,0.08);
+    opacity: 0;
+    animation: cardIn 0.35s ease forwards;
+}
+
+@keyframes cardIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
 }
 
 h2 {
@@ -62,6 +74,13 @@ h2 {
     position: relative;
     margin-bottom: 22px;
     padding-left: 20px;
+    opacity: 0;
+    animation: eventIn 0.35s ease forwards;
+}
+
+@keyframes eventIn {
+    from { opacity: 0; transform: translateX(-8px); }
+    to { opacity: 1; transform: translateX(0); }
 }
 
 .event::before {
@@ -73,6 +92,12 @@ h2 {
     height: 14px;
     background: #2563eb;
     border-radius: 50%;
+    box-shadow: 0 0 0 4px #eff6ff;
+    transition: transform 0.2s ease;
+}
+
+.event:hover::before {
+    transform: scale(1.2);
 }
 
 .event-action {
@@ -84,6 +109,17 @@ h2 {
     font-size: 13px;
     color: #6b7280;
     margin-top: 4px;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 40px 20px;
+    color: #9ca3af;
+}
+.empty-state .empty-icon {
+    font-size: 36px;
+    display: block;
+    margin-bottom: 8px;
 }
 </style>
 
@@ -101,7 +137,7 @@ h2 {
         {% if history %}
             <div class="timeline">
                 {% for log in history %}
-                    <div class="event">
+                    <div class="event" style="animation-delay: calc({{ forloop.counter0 }} * 40ms);">
                         <div class="event-action">
                             {{ log.action }}
                         </div>
@@ -112,7 +148,10 @@ h2 {
                 {% endfor %}
             </div>
         {% else %}
-            <p style="color:#6b7280;">No activity recorded yet.</p>
+            <div class="empty-state">
+                <span class="empty-icon">🕓</span>
+                No activity recorded yet.
+            </div>
         {% endif %}
 
     </div>

@@ -713,7 +713,8 @@ header {
             <!-- 👤 Profile avatar -->
             <a href="{% url 'accounts:customer_profile' %}" class="profile-avatar" aria-label="Profile">
                 {% if customer.profile_photo %}
-                    <img src="{{ customer.profile_photo.url }}" alt="Profile">
+                    <img src="{{ customer.profile_photo.url }}" alt="{{ user.username }}"
+                         onerror="this.outerHTML='{{ user.username|slice:':2'|upper }}'">
                 {% else %}
                     {{ user.username|slice:":2"|upper }}
                 {% endif %}
@@ -749,15 +750,9 @@ header {
                     🏢<br>Manage Business Profile
                 </a>
 
-                {% if request.user.role == "customer" %}
                 <a href="{% url 'documents:customer_documents' %}" class="action-card">
                     📂<br>View / Upload Documents
                 </a>
-                {% elif request.user.role == "admin" %}
-                <a href="{% url 'documents:admin_all_documents' %}" class="action-card">
-                    📂<br>Manage Documents
-                </a>
-                {% endif %}
 
                 <a href="{% url 'accounts:contact_admin' %}" class="action-card">
                     🎫<br>Contact Admin

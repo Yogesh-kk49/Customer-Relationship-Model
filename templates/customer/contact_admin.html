@@ -428,7 +428,8 @@ body::before {
             <!-- Profile Avatar -->
             <div class="avatar">
                 {% if admin_user.profile_photo %}
-                    <img src="{{ admin_user.profile_photo.url }}" alt="{{ admin_user.username }}">
+                    <img src="{{ admin_user.profile_photo.url }}" alt="{{ admin_user.username }}"
+                         onerror="this.outerHTML='<div class=&quot;avatar-placeholder&quot;>{{ admin_user.username|slice:':2'|upper }}</div>'">
                 {% else %}
                     <div class="avatar-placeholder">
                         {{ admin_user.username|slice:":2"|upper }}

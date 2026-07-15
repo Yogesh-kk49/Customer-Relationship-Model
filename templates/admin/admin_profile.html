@@ -315,7 +315,8 @@ input:disabled {
         <div class="profile-grid">
             <div class="card">
                 {% if profile.profile_photo %}
-                    <img src="{{ profile.profile_photo.url }}" class="profile-photo" alt="Profile">
+                    <img src="{{ profile.profile_photo.url }}" class="profile-photo" alt="{{ request.user.username }}"
+                         onerror="this.outerHTML='<div class=&quot;profile-placeholder&quot;>{{ request.user.username|slice:':2'|upper }}</div>'">
                 {% else %}
                     <div class="profile-placeholder">
                         {{ request.user.username|slice:":2"|upper }}

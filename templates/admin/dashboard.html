@@ -830,7 +830,8 @@ tr:last-child td {
             <!-- 👤 Profile avatar -->
             <a href="{% url 'accounts:admin_profile' %}" class="profile-avatar" aria-label="Profile">
                 {% if request.user.profile_photo %}
-                    <img src="{{ request.user.profile_photo.url }}" alt="Profile">
+                    <img src="{{ request.user.profile_photo.url }}" alt="{{ user.username }}"
+                         onerror="this.outerHTML='{{ user.username|slice:':2'|upper }}'">
                 {% else %}
                     {{ user.username|slice:":2"|upper }}
                 {% endif %}

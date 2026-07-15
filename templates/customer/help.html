@@ -35,6 +35,13 @@
     border-radius: 14px;
     box-shadow: 0 12px 30px rgba(0,0,0,0.08);
     margin-top: 24px;
+    opacity: 0;
+    animation: cardIn 0.35s ease forwards;
+}
+
+@keyframes cardIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
 }
 
 h1 {
@@ -69,6 +76,11 @@ h1 {
     background: #f8fafc;
     border-radius: 10px;
     border-left: 4px solid #2563eb;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.help-item:hover {
+    transform: translateX(4px);
+    box-shadow: 0 6px 16px rgba(0,0,0,0.06);
 }
 
 .help-icon {
@@ -121,6 +133,11 @@ h1 {
     text-decoration: none;
     display: inline-block;
     margin-top: 20px;
+    transition: all 0.2s ease;
+}
+.contact-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 24px rgba(0,0,0,0.2);
 }
 </style>
 
