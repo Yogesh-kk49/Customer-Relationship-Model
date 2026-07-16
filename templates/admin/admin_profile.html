@@ -348,7 +348,7 @@ input:disabled {
                     maxlength="10"
                     inputmode="numeric"
                     oninput="this.value=this.value.replace(/[^0-9]/g,'').slice(0,10)">
-                <button class="btn" type="submit">Save Profile Changes</button>
+                <button class="btn" type="submit" onclick="return confirm('Save these profile changes?');">Save Profile Changes</button>
             </div>
 
             <div class="card">
@@ -375,7 +375,7 @@ input:disabled {
                         👁 Show / Hide Passwords
                     </span>
 
-                    <button class="btn" type="submit">Update Password</button>
+                    <button class="btn" type="submit" onclick="return confirm('Update your password now? You will need the new password next time you log in.');">Update Password</button>
                 </div>
             </div>
         </div>

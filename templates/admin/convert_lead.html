@@ -140,7 +140,7 @@
             {% endfor %}
         {% endif %}
 
-        <form method="POST">
+        <form method="POST" onsubmit="return confirm('Convert this lead into a customer? This action will create a new customer record.');">
             {% csrf_token %}
 
         
@@ -179,6 +179,9 @@
                     placeholder="10-digit mobile number"
                     pattern="[0-9]{10}"
                     title="Enter a 10-digit mobile number"
+                    maxlength="10"
+                    inputmode="numeric"
+                    oninput="this.value=this.value.replace(/[^0-9]/g,'').slice(0,10)"
                     value="{{ entered_mobile|default:'' }}"
                 >
             </div>

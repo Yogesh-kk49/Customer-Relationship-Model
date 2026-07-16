@@ -121,6 +121,24 @@ h1 {
     display: inline-block;
     margin-top: 16px;
 }
+
+.terms-credit {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 28px;
+    padding-top: 20px;
+    border-top: 1px solid #f1f5f9;
+    color: #9ca3af;
+    font-size: 12.5px;
+    letter-spacing: 0.2px;
+}
+.terms-credit img {
+    height: 24px;
+    width: auto;
+    object-fit: contain;
+}
 </style>
 
 <div class="container">
@@ -189,6 +207,11 @@ h1 {
             <a href="{% url 'accounts:customer_dashboard' %}" class="agree-btn">
                 Continue to Dashboard
             </a>
+        </div>
+
+        <div class="terms-credit">
+            Built and developed by
+            <img src="{% static 'images/yk-logo-full.png' %}" alt="YK Product">
         </div>
     </div>
 </div>

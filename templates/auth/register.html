@@ -33,6 +33,19 @@
         background: linear-gradient(90deg, #2563eb, #60a5fa);
     }
 
+    .back-btn {
+        display: inline-block;
+        background: #dc2626;
+        color: white;
+        padding: 10px 18px;
+        border-radius: 10px;
+        font-size: 14px;
+        font-weight: 600;
+        text-decoration: none;
+        margin-bottom: 20px;
+    }
+    .back-btn:hover { background: #b91c1c; }
+
     .brand-mark {
         width: 52px;
         height: 52px;
@@ -44,6 +57,13 @@
         justify-content: center;
         box-shadow: 0 10px 24px rgba(37,99,235,0.3);
         font-size: 24px;
+        overflow: hidden;
+    }
+    .brand-mark img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+        padding: 9px;
     }
 
     .auth-box h2 {
@@ -174,7 +194,11 @@
 
 <div class="auth-wrapper">
     <div class="auth-box">
-        <div class="brand-mark">📇</div>
+        <a href="{% url 'accounts:home' %}" class="back-btn">← Back</a>
+
+        <div class="brand-mark">
+            <img src="{% static 'images/yk-icon.png' %}" alt="YK logo">
+        </div>
         <h2>Create Account</h2>
         <p class="lead">Register to access your dashboard</p>
 
@@ -193,7 +217,7 @@
             ⚠️ Note: Accounts created here are registered as <strong>Admin accounts</strong> only.
         </div>
 
-        <form method="post">
+        <form method="post" onsubmit="return confirm('Create this admin account with the details entered?');">
             {% csrf_token %}
 
             <div class="form-group">
@@ -223,6 +247,8 @@
                     placeholder="10-digit mobile number"
                     pattern="[0-9]{10}"
                     title="Enter a 10-digit mobile number"
+                    inputmode="numeric"
+                    maxlength="10"
                     required
                 >
                 <div class="hint">Digits only, no spaces or country code.</div>
@@ -246,5 +272,10 @@
         btn.textContent = isHidden ? '🙈' : '👁';
         btn.setAttribute('aria-label', isHidden ? 'Hide password' : 'Show password');
     }
+
+    // Allow only up to 10 digits to be typed in the mobile field
+    document.getElementById('id_reg_mobile').addEventListener('input', function (e) {
+        e.target.value = e.target.value.replace(/\D/g, '').slice(0, 10);
+    });
 </script>
 {% endblock %}

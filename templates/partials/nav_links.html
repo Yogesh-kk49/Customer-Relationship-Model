@@ -14,7 +14,7 @@
         <a href="{% url 'accounts:customer_help' %}" class="nav-link {% if request.resolver_match.url_name == 'customer_help' %}active{% endif %}">🆘 Help</a>
         <a href="{% url 'accounts:customer_terms' %}" class="nav-link {% if request.resolver_match.url_name == 'customer_terms' %}active{% endif %}">📄 Terms</a>
     {% endif %}
-    <a href="{% url 'accounts:logout' %}" class="nav-btn nav-btn-danger">🚪 Logout</a>
+    <a href="{% url 'accounts:logout' %}" class="nav-btn nav-btn-danger" onclick="return confirmNavigate(event, {icon:'⏻', title:'Confirm Logout', message:'Are you sure you want to logout? You will need to login again to access your account.', confirmText:'Yes, Logout'});">🚪 Logout</a>
 {% else %}
     {% if request.resolver_match.url_name != 'home' %}
         <a href="{% url 'accounts:home' %}" class="nav-link">🏠 Home</a>

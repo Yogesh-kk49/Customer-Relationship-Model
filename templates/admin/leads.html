@@ -253,7 +253,7 @@
 
                             <form method="post"
                                   action="{% url 'accounts:delete_lead' lead.id %}"
-                                  onsubmit="return confirm('Are you sure you want to delete this lead?');">
+                                  onsubmit="return confirmSubmit(event, {icon:'🗑️', title:'Delete Lead', message:'Are you sure you want to delete this lead? This action cannot be undone.', confirmText:'Yes, Delete'});">
                                 {% csrf_token %}
                                 <button type="submit" class="btn btn-delete">
                                     Delete

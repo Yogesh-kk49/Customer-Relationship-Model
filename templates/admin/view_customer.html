@@ -161,28 +161,78 @@
 
     .card {
         background: #ffffff;
+        border: 1px solid #e5e7eb;
         border-radius: 12px;
         padding: 25px;
-        box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+        box-shadow: 0 1px 3px rgba(15,23,42,0.06);
     }
 
     .card h3 {
         margin-bottom: 18px;
         color: #1f2937;
+        font-size: 16px;
+        font-weight: 700;
+    }
+
+    /* ============ KPI STAT CARDS ============ */
+    .stat-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 18px;
+        margin-bottom: 24px;
+    }
+    .stat-card {
+        background: #ffffff;
+        border: 1px solid #e5e7eb;
+        border-radius: 12px;
+        padding: 18px 20px;
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        box-shadow: 0 1px 3px rgba(15,23,42,0.06);
+        transition: box-shadow 0.2s ease, transform 0.2s ease;
+    }
+    .stat-card:hover { box-shadow: 0 8px 24px rgba(15,23,42,0.08); transform: translateY(-2px); }
+    .stat-icon {
+        width: 44px; height: 44px;
+        border-radius: 10px;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 19px;
+        flex-shrink: 0;
+    }
+    .stat-icon.investment { background: #eff6ff; color: #2563eb; }
+    .stat-icon.expected { background: #f5f3ff; color: #7c3aed; }
+    .stat-icon.actual { background: #ecfdf5; color: #059669; }
+    .stat-label {
+        font-size: 12px; font-weight: 600; color: #6b7280;
+        text-transform: uppercase; letter-spacing: 0.4px; margin-bottom: 3px;
+    }
+    .stat-value { font-size: 19px; font-weight: 700; color: #111827; }
+
+    @media (max-width: 768px) {
+        .stat-grid { grid-template-columns: 1fr; }
     }
 
     .info-row {
         margin-bottom: 14px;
+        padding-bottom: 14px;
+        border-bottom: 1px solid #f3f4f6;
     }
+    .info-row:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
 
     .label {
         font-weight: 600;
-        color: #374151;
+        color: #6b7280;
+        font-size: 12.5px;
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
     }
 
     .value {
-        color: #4b5563;
-        margin-top: 4px;
+        color: #111827;
+        margin-top: 5px;
+        font-size: 15px;
+        font-weight: 500;
     }
 
     .chart-container {
@@ -283,6 +333,30 @@
         </div>
     </div>
 
+    <div class="stat-grid">
+        <div class="stat-card">
+            <div class="stat-icon investment">💰</div>
+            <div>
+                <div class="stat-label">Investment</div>
+                <div class="stat-value">₹{{ profile.investment|floatformat:0|default:"0" }}</div>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon expected">📈</div>
+            <div>
+                <div class="stat-label">Expected Profit</div>
+                <div class="stat-value">₹{{ profile.expected_profit|floatformat:0|default:"0" }}</div>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon actual">✅</div>
+            <div>
+                <div class="stat-label">Actual Profit</div>
+                <div class="stat-value">₹{{ profile.actual_profit|floatformat:0|default:"0" }}</div>
+            </div>
+        </div>
+    </div>
+
     <div class="grid">
         <div class="card">
             <h3>Customer Information</h3>
@@ -318,11 +392,6 @@
 
         <div class="card">
             <h3>Business Overview</h3>
-            <div class="live-data">
-                <strong>Investment:</strong> ₹{{ profile.investment|floatformat:0|default:"0" }}<br>
-                <strong>Expected:</strong> ₹{{ profile.expected_profit|floatformat:0|default:"0" }}<br>
-                <strong>Actual:</strong> ₹{{ profile.actual_profit|floatformat:0|default:"0" }}
-            </div>
             <div class="chart-container">
                 <canvas id="businessChart"></canvas>
             </div>

@@ -461,17 +461,102 @@
             opacity: 0.95;
         }
 
+        /* ===================== NAV: ALWAYS COLLAPSED INTO HAMBURGER ===================== */
+        /* Only the logo, notification bell, and hamburger toggle live in the header bar.
+           Dashboard, Leads, and every other nav action live inside the hamburger panel. */
+        .main-nav { display: none; }
+        .nav-toggle { display: inline-flex; }
+
         /* ===================== RESPONSIVE ===================== */
-        @media (max-width: 1080px) {
-            .main-nav { display: none; }
-            .nav-toggle { display: inline-flex; }
-        }
 
         @media (max-width: 768px) {
             .container { padding: 20px 16px; }
             .container > .container { margin: 20px auto 40px !important; padding: 0 !important; }
             header { padding: 12px 16px; }
         }
+
+        /* ===================== GLOBAL CONFIRM MODAL ===================== */
+        .gc-modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            z-index: 3000;
+            background-color: rgba(0,0,0,0.5);
+            backdrop-filter: blur(4px);
+            align-items: center;
+            justify-content: center;
+        }
+        .gc-modal.active { display: flex; }
+
+        .gc-modal-content {
+            background: white;
+            padding: 35px;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 420px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            text-align: center;
+            animation: gcModalIn 0.22s ease-out;
+        }
+
+        @keyframes gcModalIn {
+            from { opacity: 0; transform: translateY(-20px) scale(0.96); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        .gc-icon {
+            font-size: 56px;
+            background: linear-gradient(135deg, #dc2626, #b91c1c);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 16px;
+            display: block;
+        }
+
+        .gc-modal-content h3 {
+            color: #1f2937;
+            margin-bottom: 10px;
+            font-size: 21px;
+            font-weight: 700;
+        }
+
+        .gc-modal-content p {
+            color: #6b7280;
+            line-height: 1.6;
+            margin-bottom: 26px;
+            font-size: 15px;
+        }
+
+        .gc-buttons {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+        }
+
+        .gc-confirm-btn, .gc-cancel-btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 14.5px;
+            flex: 1;
+            transition: all 0.2s ease;
+        }
+
+        .gc-confirm-btn {
+            background: #dc2626;
+            color: white;
+        }
+        .gc-confirm-btn:hover { background: #b91c1c; transform: translateY(-1px); }
+
+        .gc-cancel-btn {
+            background: #f3f4f6;
+            color: #374151;
+            border: 1px solid #d1d5db;
+        }
+        .gc-cancel-btn:hover { background: #e5e7eb; transform: translateY(-1px); }
     </style>
 </head>
 
@@ -495,10 +580,6 @@
 
         <div class="header-right">
             {% block header_right %}
-            <nav class="main-nav" aria-label="Primary">
-                {% include "partials/nav_links.html" %}
-            </nav>
-
             {% if show_notifications and request.user.is_authenticated and request.user.is_staff %}
                 <div class="notification-container">
                     <button type="button" class="notification-bell" id="baseBell" onclick="toggleBaseNotifications(event)" aria-label="Notifications">
@@ -568,6 +649,19 @@
         {% endblock %}
     {% endblock %}
 
+    <!-- GLOBAL CONFIRM MODAL (used for logout, delete, and other sensitive actions) -->
+    <div id="gcModal" class="gc-modal">
+        <div class="gc-modal-content">
+            <span class="gc-icon" id="gcIcon">⏻</span>
+            <h3 id="gcTitle">Are you sure?</h3>
+            <p id="gcMessage">Please confirm this action.</p>
+            <div class="gc-buttons">
+                <button type="button" class="gc-confirm-btn" id="gcConfirmBtn">Yes, Continue</button>
+                <button type="button" class="gc-cancel-btn" onclick="closeGlobalConfirm()">Cancel</button>
+            </div>
+        </div>
+    </div>
+
     <script>
     document.addEventListener('DOMContentLoaded', function () {
         // Mobile nav toggle
@@ -626,6 +720,46 @@
                 dropdown.classList.remove('active');
             }
         });
+
+        // ============ GLOBAL CONFIRM MODAL ============
+        window.closeGlobalConfirm = function () {
+            document.getElementById('gcModal').classList.remove('active');
+        };
+
+        // Generic opener: pass icon/title/message/confirmText and an onConfirm callback
+        window.openGlobalConfirm = function (opts) {
+            var modal = document.getElementById('gcModal');
+            document.getElementById('gcIcon').textContent = opts.icon || '⚠️';
+            document.getElementById('gcTitle').textContent = opts.title || 'Are you sure?';
+            document.getElementById('gcMessage').textContent = opts.message || 'Please confirm this action.';
+            var confirmBtn = document.getElementById('gcConfirmBtn');
+            confirmBtn.textContent = opts.confirmText || 'Yes, Continue';
+            confirmBtn.onclick = function () {
+                closeGlobalConfirm();
+                if (typeof opts.onConfirm === 'function') opts.onConfirm();
+            };
+            modal.classList.add('active');
+        };
+
+        // For <a> links (e.g. Logout): intercepts the click, shows the modal, then navigates on confirm
+        window.confirmNavigate = function (event, opts) {
+            event.preventDefault();
+            var href = event.currentTarget.href;
+            opts = opts || {};
+            opts.onConfirm = function () { window.location.href = href; };
+            openGlobalConfirm(opts);
+            return false;
+        };
+
+        // For <form> submissions (e.g. Delete): intercepts submit, shows the modal, then submits on confirm
+        window.confirmSubmit = function (event, opts) {
+            event.preventDefault();
+            var form = event.currentTarget || event.target;
+            opts = opts || {};
+            opts.onConfirm = function () { form.submit(); };
+            openGlobalConfirm(opts);
+            return false;
+        };
     });
     </script>
 </body>
