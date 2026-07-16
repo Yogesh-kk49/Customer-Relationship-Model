@@ -1,10 +1,11 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="MyCRM — manage customers, leads and activity in one place.">
-    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='6' fill='%232563eb'/%3E%3Cpath d='M7 12.5l3 3 7-7' stroke='white' stroke-width='2' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+    <link rel="icon" href="{% static 'images/yk-icon.png' %}">
     <title>{% block title %}MyCRM{% endblock %}</title>
 
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
@@ -95,26 +96,24 @@
         }
 
         .logo-mark {
-            width: 34px;
-            height: 34px;
-            border-radius: 10px;
-            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+            width: 36px;
+            height: 36px;
             display: flex;
             align-items: center;
             justify-content: center;
-            box-shadow: 0 3px 10px rgba(37,99,235,0.45), inset 0 1px 0 rgba(255,255,255,0.25);
             transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
             flex-shrink: 0;
         }
 
-        .logo-mark svg {
-            width: 19px;
-            height: 19px;
+        .logo-mark img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
             display: block;
         }
 
         .logo:hover .logo-mark {
-            transform: rotate(-6deg) scale(1.06);
+            transform: scale(1.06);
         }
 
         .logo-word {
@@ -438,8 +437,32 @@
         .site-footer a { color: rgba(255,255,255,0.85); text-decoration: none; }
         .site-footer a:hover { color: #fff; text-decoration: underline; }
 
+        .footer-inner {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 6px 18px;
+        }
+
+        .footer-credit {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            color: rgba(255,255,255,0.55);
+            font-size: 12px;
+            letter-spacing: 0.2px;
+        }
+
+        .footer-credit img {
+            height: 26px;
+            width: auto;
+            object-fit: contain;
+            opacity: 0.95;
+        }
+
         /* ===================== RESPONSIVE ===================== */
-        @media (max-width: 860px) {
+        @media (max-width: 1080px) {
             .main-nav { display: none; }
             .nav-toggle { display: inline-flex; }
         }
@@ -465,12 +488,7 @@
     <header>
         <a href="{% url 'accounts:home' %}" class="logo">
             <span class="logo-mark">
-                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <circle cx="7" cy="7" r="3" stroke="white" stroke-width="1.8"/>
-                    <circle cx="17" cy="7" r="3" stroke="white" stroke-width="1.8"/>
-                    <circle cx="12" cy="17" r="3" stroke="white" stroke-width="1.8"/>
-                    <path d="M9.2 8.6L11 14.3M14.8 8.6L13 14.3M9.6 6H14.4" stroke="white" stroke-width="1.6" stroke-linecap="round"/>
-                </svg>
+                <img src="{% static 'images/yk-icon.png' %}" alt="YK Product logo">
             </span>
             <span class="logo-word">My<span class="accent">CRM</span></span>
         </a>
@@ -539,8 +557,13 @@
 
         {% block footer %}
         <footer class="site-footer">
-            &copy; {% now "Y" %} MyCRM. All rights reserved. &middot;
-            <a href="{% url 'accounts:home' %}">Home</a>
+            <div class="footer-inner">
+                <span>&copy; {% now "Y" %} MyCRM. All rights reserved. &middot; <a href="{% url 'accounts:home' %}">Home</a></span>
+                <span class="footer-credit">
+                    Designed &amp; built by
+                    <img src="{% static 'images/yk-logo-full.png' %}" alt="YK Product — Designed, Built, Delivered">
+                </span>
+            </div>
         </footer>
         {% endblock %}
     {% endblock %}

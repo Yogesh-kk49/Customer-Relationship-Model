@@ -1,8 +1,42 @@
 {% extends "base.html" %}
 {% load static %}
 
-{% block show_header %}{% endblock %}
-{% block page_wrapper %}
+{% block header_right %}
+<nav class="main-nav" aria-label="Primary">
+    {% include "partials/nav_links.html" %}
+</nav>
+
+<div class="notification-container">
+    <button type="button" class="bell" onclick="toggleNotifications()" id="bellIcon" aria-label="Notifications">
+        🔔
+        <span class="bell-dot" id="bellDot"></span>
+    </button>
+
+    <div class="dashboard-notification-box" id="notificationBox">
+        <div class="dashboard-notification-header">
+            Notifications
+            <span id="notificationCount"></span>
+        </div>
+        <div class="dashboard-notification-content" id="notificationContent">
+            <!-- Populated by JavaScript -->
+        </div>
+    </div>
+</div>
+
+<a href="{% url 'accounts:customer_profile' %}" class="profile-avatar" aria-label="Profile">
+    {% if customer.profile_photo %}
+        <img src="{{ customer.profile_photo.url }}" alt="{{ user.username }}"
+             onerror="this.outerHTML='{{ user.username|slice:':2'|upper }}'">
+    {% else %}
+        {{ user.username|slice:":2"|upper }}
+    {% endif %}
+</a>
+
+<button type="button" class="nav-toggle" id="navToggle" onclick="toggleMobileNav(event)" aria-label="Open menu">☰</button>
+<div class="mobile-nav-panel" id="mobileNavPanel">
+    {% include "partials/nav_links.html" %}
+</div>
+{% endblock %}
 
 {% block content %}
 
@@ -33,55 +67,11 @@ html, body {
     background: var(--bg);
 }
 
-/* ===== HEADER OVERRIDE ===== */
-header {
-    position: fixed !important;
-    top: 0 !important;
-    left: 0 !important;
-    right: 0 !important;
-    height: 64px !important;
-    background: linear-gradient(180deg, var(--dark-light), var(--dark)) !important;
-    padding: 0 24px !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: space-between !important;
-    z-index: 1000 !important;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1) !important;
-}
-
-.header-left {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-}
-
-.menu-btn {
-    font-size: 22px;
-    color: #fff;
-    cursor: pointer;
-    background: none;
-    border: none;
-    padding: 8px;
-    transition: opacity 0.2s;
-}
-
-.menu-btn:hover {
-    opacity: 0.8;
-}
-
-.logo {
-    color: #fff;
-    font-size: 20px;
-    font-weight: 600;
-    letter-spacing: 0.5px;
-}
-
-/* ===== HEADER RIGHT ===== */
-.header-right {
-    display: flex;
-    align-items: center;
-    gap: 24px;
+/* ===== NOTIFICATION BELL (sits inside shared header) ===== */
+.notification-container {
     position: relative;
+    display: flex;
+    align-items: center;
 }
 
 .bell {
@@ -462,59 +452,6 @@ header {
     object-fit: cover;
 }
 
-/* ===== SIDEBAR ===== */
-.sidebar {
-    position: fixed;
-    top: 64px;
-    left: 0;
-    width: 260px;
-    height: calc(100vh - 64px);
-    background: var(--dark);
-    padding: 22px;
-    transition: transform .3s ease;
-    z-index: 900;
-    transform: translateX(-100%);
-}
-
-.sidebar.active { 
-    transform: translateX(0);
-}
-
-.sidebar a {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 12px 14px;
-    border-radius: 10px;
-    color: #e5e7eb;
-    text-decoration: none;
-    margin-bottom: 8px;
-    transition: all 0.2s;
-    font-size: 14px;
-}
-
-.sidebar a:hover { 
-    background: #1f2937;
-    color: #fff;
-    padding-left: 18px;
-}
-
-/* ===== OVERLAY FOR SIDEBAR ===== */
-.sidebar-overlay {
-    position: fixed;
-    top: 64px;
-    left: 0;
-    width: 100%;
-    height: calc(100vh - 64px);
-    background: rgba(0,0,0,0.5);
-    display: none;
-    z-index: 850;
-}
-
-.sidebar-overlay.active {
-    display: block;
-}
-
 /* ===== CONTENT ===== */
 .dashboard-wrapper {
     width: 100%;
@@ -524,12 +461,9 @@ header {
 }
 
 .dashboard-content {
-    margin-top: 64px;
-    margin-left: 0;
-    margin-right: 0;
-    margin-bottom: 0;
+    margin: 0;
     padding: 0;
-    min-height: calc(100vh - 64px);
+    min-height: calc(100vh - 130px);
     width: 100%;
     display: grid;
     grid-template-rows: auto 1fr;
@@ -684,54 +618,6 @@ header {
 </style>
 
 <div class="dashboard-wrapper">
-    <!-- ===== HEADER ===== -->
-    <header>
-        <div class="header-left">
-            <button class="menu-btn" onclick="toggleSidebar()">☰</button>
-            <div class="logo">MyCRM</div>
-        </div>
-
-        <div class="header-right">
-            <!-- 🔔 Bell - Notifications -->
-            <button class="bell" onclick="toggleNotifications()" id="bellIcon" aria-label="Notifications">
-                🔔
-                <span class="bell-dot" id="bellDot"></span>
-            </button>
-
-            <!-- 🔔 Notifications dropdown -->
-            <div class="dashboard-notification-box" id="notificationBox">
-                <div class="dashboard-notification-header">
-                    Notifications 
-                    <span id="notificationCount"></span>
-                </div>
-                
-                <div class="dashboard-notification-content" id="notificationContent">
-                    <!-- Content will be populated by JavaScript -->
-                </div>
-            </div>
-
-            <!-- 👤 Profile avatar -->
-            <a href="{% url 'accounts:customer_profile' %}" class="profile-avatar" aria-label="Profile">
-                {% if customer.profile_photo %}
-                    <img src="{{ customer.profile_photo.url }}" alt="{{ user.username }}"
-                         onerror="this.outerHTML='{{ user.username|slice:':2'|upper }}'">
-                {% else %}
-                    {{ user.username|slice:":2"|upper }}
-                {% endif %}
-            </a>
-        </div>
-    </header>
-
-    <!-- ===== SIDEBAR OVERLAY ===== -->
-    <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
-
-    <!-- ===== SIDEBAR ===== -->
-    <div class="sidebar" id="sidebar">
-        <a href="{% url 'accounts:customer_history' %}">📜 History</a>
-        <a href="{% url 'accounts:customer_help' %}">❓ Help</a>
-        <a href="{% url 'accounts:customer_terms' %}">📄 Terms & Conditions</a>
-    </div>
-
     <!-- ===== CONTENT ===== -->
     <div class="dashboard-content">
         <div class="panel">
@@ -1026,26 +912,6 @@ class NotificationManager {
 const notificationManager = new NotificationManager();
 
 // ========================================
-// SIDEBAR & LAYOUT MANAGEMENT
-// ========================================
-
-function toggleSidebar() {
-    const sidebar = document.getElementById('sidebar');
-    const overlay = document.getElementById('sidebarOverlay');
-    
-    sidebar.classList.toggle('active');
-    overlay.classList.toggle('active');
-}
-
-function closeSidebar() {
-    const sidebar = document.getElementById('sidebar');
-    const overlay = document.getElementById('sidebarOverlay');
-    
-    sidebar.classList.remove('active');
-    overlay.classList.remove('active');
-}
-
-// ========================================
 // NOTIFICATION DROPDOWN
 // ========================================
 
@@ -1095,17 +961,6 @@ document.addEventListener('click', function(e) {
     }
 });
 
-// Close sidebar when clicking outside
-document.addEventListener('click', function(e) {
-    const sidebar = document.getElementById('sidebar');
-    const menuBtn = document.querySelector('.menu-btn');
-    
-    if (sidebar && sidebar.classList.contains('active') && 
-        !sidebar.contains(e.target) && !menuBtn.contains(e.target)) {
-        closeSidebar();
-    }
-});
-
 // Restore notification state on page reload
 window.addEventListener('load', function() {
     if (notificationManager) {
@@ -1114,5 +969,4 @@ window.addEventListener('load', function() {
 });
 </script>
 
-{% endblock %}
 {% endblock %}

@@ -5,12 +5,14 @@
         <a href="{% url 'accounts:admin_history' %}" class="nav-link {% if request.resolver_match.url_name == 'admin_history' %}active{% endif %}">🕓 History</a>
         <a href="{% url 'accounts:admin_profile' %}" class="nav-link {% if request.resolver_match.url_name == 'admin_profile' %}active{% endif %}">👤 Profile</a>
         <a href="{% url 'accounts:admin_help' %}" class="nav-link {% if request.resolver_match.url_name == 'admin_help' %}active{% endif %}">🆘 Help</a>
+        <a href="{% url 'accounts:admin_terms' %}" class="nav-link {% if request.resolver_match.url_name == 'admin_terms' %}active{% endif %}">📄 Terms</a>
     {% else %}
         <a href="{% url 'accounts:customer_dashboard' %}" class="nav-link {% if request.resolver_match.url_name == 'customer_dashboard' %}active{% endif %}">🏠 Dashboard</a>
         <a href="{% url 'accounts:customer_profile' %}" class="nav-link {% if request.resolver_match.url_name == 'customer_profile' %}active{% endif %}">👤 Profile</a>
         <a href="{% url 'accounts:customer_business_profile' %}" class="nav-link {% if request.resolver_match.url_name == 'customer_business_profile' %}active{% endif %}">🏢 Business</a>
         <a href="{% url 'accounts:customer_history' %}" class="nav-link {% if request.resolver_match.url_name == 'customer_history' %}active{% endif %}">🕓 History</a>
         <a href="{% url 'accounts:customer_help' %}" class="nav-link {% if request.resolver_match.url_name == 'customer_help' %}active{% endif %}">🆘 Help</a>
+        <a href="{% url 'accounts:customer_terms' %}" class="nav-link {% if request.resolver_match.url_name == 'customer_terms' %}active{% endif %}">📄 Terms</a>
     {% endif %}
     <a href="{% url 'accounts:logout' %}" class="nav-btn nav-btn-danger">🚪 Logout</a>
 {% else %}
