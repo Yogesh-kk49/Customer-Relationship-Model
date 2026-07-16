@@ -1,0 +1,24 @@
+name: Ping Bot - Keep Render App Awake
+
+# This is the "ping bot": it hits your live Render URL's /health/ endpoint
+# every 10 minutes so the free-tier web service never sits idle long enough
+# (Render's free tier sleeps after ~15 minutes of no traffic) to spin down.
+on:
+  schedule:
+    - cron: "*/10 * * * *"   # every 10 minutes, UTC
+  workflow_dispatch: {}       # lets you manually trigger a ping from the Actions tab
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping the app's health endpoint
+        run: |
+          URL="${{ secrets.RENDER_APP_URL }}/health/"
+          echo "Pinging $URL ..."
+          STATUS=$(curl -s -o /dev/null -w "%{http_code}" --max-time 30 "$URL")
+          if [ "$STATUS" = "200" ]; then
+            echo "✅ App is awake (HTTP $STATUS) at $(date -u)"
+          else
+            echo "⚠️  App responded with HTTP $STATUS at $(date -u) — it may be cold-starting, this run likely just woke it up."
+          fi
