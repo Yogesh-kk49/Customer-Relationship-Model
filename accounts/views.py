@@ -408,16 +408,42 @@ def convert_lead(request, lead_id):
     lead = get_object_or_404(Lead, id=lead_id)
 
     if request.method == "POST":
+        new_username = request.POST.get("new_username")
+        email = request.POST.get("email")
+        password = request.POST.get("password")
+        mobile = request.POST.get("mobile", "")
+
+        if User.objects.filter(username=new_username).exists():
+            messages.error(request, "That username is already taken.")
+            return render(request, "admin/convert_lead.html", {
+                "lead": lead,
+                "entered_mobile": mobile
+            })
+
+        if User.objects.filter(email=email).exists():
+            messages.error(request, "A user with this email already exists.")
+            return render(request, "admin/convert_lead.html", {
+                "lead": lead,
+                "entered_mobile": mobile
+            })
+
+        if not mobile or not mobile.isdigit() or len(mobile) != 10:
+            messages.error(request, "Enter a valid 10-digit mobile number.")
+            return render(request, "admin/convert_lead.html", {
+                "lead": lead,
+                "entered_mobile": mobile
+            })
+
         user = User.objects.create_user(
-            username=request.POST.get("new_username"),
-            email=request.POST.get("email"),
-            password=request.POST.get("password"),
+            username=new_username,
+            email=email,
+            password=password,
             role="customer"
         )
 
         Customer.objects.create(
             user=user,
-            mobile=request.POST.get("mobile", "")
+            mobile=mobile
         )
 
         BusinessProfile.objects.create(

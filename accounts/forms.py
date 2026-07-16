@@ -5,15 +5,11 @@ from .models import BusinessProfile, Customer
 class BusinessProfileForm(forms.ModelForm):
     class Meta:
         model = BusinessProfile
-        fields = ['business_type', 'mobile', 'investment', 'expected_profit', 'actual_profit', 'start_date', 'end_date']
+        fields = ['business_type', 'investment', 'expected_profit', 'actual_profit', 'start_date', 'end_date']
         widgets = {
             'business_type': forms.TextInput(attrs={
                 'class': 'form-control',
                 'placeholder': 'Retail, Wholesale, etc.'
-            }),
-            'mobile': forms.TextInput(attrs={
-                'class': 'form-control',
-                'placeholder': '10-digit mobile'
             }),
             'start_date': forms.DateInput(attrs={
                 'type': 'date',

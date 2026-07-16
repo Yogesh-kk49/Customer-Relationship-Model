@@ -122,7 +122,7 @@ def admin_upload_document(request, user_id):
 
     return render(
         request,
-        "documents/admin_upload_documents.html",
+        "documents/documents_admin_upload_documents.html",
         {
             "customer": customer,
             "documents": documents
