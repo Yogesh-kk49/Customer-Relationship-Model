@@ -36,6 +36,25 @@
         border-radius: 4px;
         font-weight: 600;
     }
+    .demo-note a {
+        color: #1e40af;
+        font-weight: 700;
+        text-decoration: underline;
+    }
+    .demo-note a:hover { color: #1e3a8a; }
+
+    .role-error {
+        display: none;
+        color: #b91c1c;
+        background: #fef2f2;
+        border: 1px solid #fecaca;
+        padding: 10px 14px;
+        border-radius: 10px;
+        margin-bottom: 20px;
+        font-size: 13.5px;
+        font-weight: 500;
+    }
+    .role-error.active { display: block; }
     .login-wrapper {
         min-height: calc(100vh - 200px);
         display: flex;
@@ -252,7 +271,7 @@
         <p class="login-subtitle">Sign in to manage your CRM</p>
 
         <div class="demo-note">
-             Trying it out? Login as <strong>Admin</strong> using <code>demo@gmail.com</code> / <code>123</code>.
+            New here? <a href="{% url 'accounts:register' %}">Register an account as a demo</a> and log in to explore the CRM.
         </div>
 
         {% if messages %}
@@ -268,6 +287,8 @@
         {% if error %}
             <div class="message error">{{ error }}</div>
         {% endif %}
+
+        <div class="role-error" id="roleError">Please select a role (Admin or Customer) to continue.</div>
 
         <form method="post">
             {% csrf_token %}
@@ -324,12 +345,23 @@
     }
 
     // Require a role to be selected before allowing login
+    var roleErrorBox = document.getElementById('roleError');
     document.querySelector('form').addEventListener('submit', function (e) {
         var roleChosen = document.querySelector('input[name="role"]:checked');
         if (!roleChosen) {
             e.preventDefault();
-            alert('Please select a role (Admin or Customer) to continue.');
+            roleErrorBox.classList.add('active');
+            roleErrorBox.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        } else {
+            roleErrorBox.classList.remove('active');
         }
+    });
+
+    // Hide the error as soon as a role is picked
+    document.querySelectorAll('.role-option').forEach(function (role) {
+        role.addEventListener('click', function () {
+            roleErrorBox.classList.remove('active');
+        });
     });
 </script>
 

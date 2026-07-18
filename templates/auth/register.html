@@ -190,6 +190,90 @@
     @media (max-width: 480px) {
         .auth-box { padding: 32px 24px; }
     }
+
+    /* Confirmation modal */
+    .modal-overlay {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(15, 23, 42, 0.55);
+        z-index: 1000;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+    }
+    .modal-overlay.active { display: flex; }
+
+    .modal-box {
+        background: #ffffff;
+        width: 100%;
+        max-width: 380px;
+        border-radius: 16px;
+        padding: 28px 26px 24px;
+        box-shadow: 0 25px 60px rgba(15,23,42,0.25);
+        text-align: center;
+        animation: modal-in 0.18s ease-out;
+    }
+    @keyframes modal-in {
+        from { opacity: 0; transform: translateY(-8px) scale(0.98); }
+        to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    .modal-icon {
+        width: 46px;
+        height: 46px;
+        margin: 0 auto 14px;
+        border-radius: 50%;
+        background: #eff6ff;
+        color: #2563eb;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 22px;
+        font-weight: 700;
+    }
+
+    .modal-box h3 {
+        font-size: 17px;
+        font-weight: 700;
+        color: #111827;
+        margin-bottom: 8px;
+    }
+
+    .modal-box p {
+        font-size: 13.5px;
+        color: #6b7280;
+        line-height: 1.5;
+        margin-bottom: 22px;
+    }
+
+    .modal-actions {
+        display: flex;
+        gap: 10px;
+    }
+
+    .modal-actions button {
+        flex: 1;
+        padding: 11px;
+        border-radius: 10px;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        border: none;
+        transition: all 0.2s ease;
+    }
+
+    .modal-cancel {
+        background: #f3f4f6;
+        color: #374151;
+    }
+    .modal-cancel:hover { background: #e5e7eb; }
+
+    .modal-confirm {
+        background: #2563eb;
+        color: #fff;
+    }
+    .modal-confirm:hover { background: #1d4ed8; }
 </style>
 
 <div class="auth-wrapper">
@@ -212,12 +296,16 @@
             {% endfor %}
         {% endif %}
 
+        {% if error %}
+            <div class="message error">{{ error }}</div>
+        {% endif %}
+
         <!-- ADMIN NOTICE -->
         <div class="admin-note">
-            ⚠️ Note: Accounts created here are registered as <strong>Admin accounts</strong> only.
+            ⚠️ Note: Accounts created here are registered as <strong>Admin accounts</strong> only. Want to try the CRM first? Register an account as a demo, then log in with it.
         </div>
 
-        <form method="post" onsubmit="return confirm('Create this admin account with the details entered?');">
+        <form method="post" id="registerForm">
             {% csrf_token %}
 
             <div class="form-group">
@@ -264,6 +352,19 @@
     </div>
 </div>
 
+<!-- Confirmation modal (replaces the native browser confirm dialog) -->
+<div class="modal-overlay" id="confirmModal">
+    <div class="modal-box">
+        <div class="modal-icon">✓</div>
+        <h3>Create this account?</h3>
+        <p>Please confirm the details you entered are correct. This will create a new admin account.</p>
+        <div class="modal-actions">
+            <button type="button" class="modal-cancel" id="modalCancelBtn">Cancel</button>
+            <button type="button" class="modal-confirm" id="modalConfirmBtn">Create Account</button>
+        </div>
+    </div>
+</div>
+
 <script>
     function togglePassword(fieldId, btn) {
         const field = document.getElementById(fieldId);
@@ -276,6 +377,35 @@
     // Allow only up to 10 digits to be typed in the mobile field
     document.getElementById('id_reg_mobile').addEventListener('input', function (e) {
         e.target.value = e.target.value.replace(/\D/g, '').slice(0, 10);
+    });
+
+    // Professional confirmation modal instead of a native confirm() popup
+    const registerForm = document.getElementById('registerForm');
+    const confirmModal = document.getElementById('confirmModal');
+    const modalCancelBtn = document.getElementById('modalCancelBtn');
+    const modalConfirmBtn = document.getElementById('modalConfirmBtn');
+
+    registerForm.addEventListener('submit', function (e) {
+        if (!registerForm.checkValidity()) {
+            return; // let the browser show native field validation first
+        }
+        e.preventDefault();
+        confirmModal.classList.add('active');
+    });
+
+    modalCancelBtn.addEventListener('click', function () {
+        confirmModal.classList.remove('active');
+    });
+
+    modalConfirmBtn.addEventListener('click', function () {
+        confirmModal.classList.remove('active');
+        registerForm.submit();
+    });
+
+    confirmModal.addEventListener('click', function (e) {
+        if (e.target === confirmModal) {
+            confirmModal.classList.remove('active');
+        }
     });
 </script>
 {% endblock %}
