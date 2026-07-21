@@ -159,7 +159,7 @@ Feel free to fork the repository and submit a pull request.
 
 ## 👨‍💻 Author
 
-**Yogesh**
+**Yogesh K**
 
 ---
 
